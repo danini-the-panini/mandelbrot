@@ -36,6 +36,9 @@ default: &default
   extensions:
     - .tsx
     - .ts
+    - .glsl
+    - .frag
+    - .vert
     - .mjs
     - .js
     - .sass

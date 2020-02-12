@@ -1,11 +1,11 @@
-const MAX_ITER = 100000
+const MAX_ITER = 570
 const ZOOM = 150.0
 
-export default function mandelbrot(x: number, y: number, { iterations = MAX_ITER, zoom = ZOOM } = {}): number {
+export default function mandelbrot(x: number, y: number, width: number, height: number, { iterations = MAX_ITER, zoom = ZOOM } = {}): number {
   let zx = 0
   let zy = 0
-  let cX = (x - 400) / zoom
-  let cY = (y - 300) / zoom
+  let cX = (x - width/2) / zoom
+  let cY = (y - height/2) / zoom
 
   let iter = iterations
 

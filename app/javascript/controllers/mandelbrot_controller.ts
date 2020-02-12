@@ -24,7 +24,7 @@ export default class extends ApplicationController {
   draw() {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        let rgb = mandelbrot(x, y)
+        let rgb = mandelbrot(x, y, this.width, this.height)
         setRGB(this.image, x, y, rgb)
       }
     }

@@ -25,7 +25,7 @@ export default abstract class ApplicationController extends Controller {
     this.clearCanvas();
   }
 
-  private clearCanvas() {
+  clearCanvas() {
     this.ctx.clearRect(0, 0, this.width, this.height);
   }
 
