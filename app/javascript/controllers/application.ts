@@ -20,6 +20,10 @@ export default abstract class ApplicationController extends Controller {
     prelog(this.outputTarget, message)
   }
 
+  clearlog() {
+    clearlog(this.outputTarget)
+  }
+
   connect() {
     this.ctx = this.canvasTarget.getContext('2d')
     this.clearCanvas();
@@ -36,8 +40,12 @@ export default abstract class ApplicationController extends Controller {
 
   abstract async perform();
 
+  async initialize() {}
+
   async run() {
-    clearlog(this.outputTarget)
+    this.clearlog()
+    this.prelog("Initializing...")
+    await this.initialize()
     this.clearCanvas()
     this.prelog("Beginning work...")
 

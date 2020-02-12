@@ -15,6 +15,7 @@
   },
   "version": "0.1.0",
   "devDependencies": {
+    "assemblyscript": "^0.9.1",
     "webpack-dev-server": "^3.10.3"
   }
 }

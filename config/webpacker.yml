@@ -39,6 +39,7 @@ default: &default
     - .glsl
     - .frag
     - .vert
+    - .wasm
     - .mjs
     - .js
     - .sass

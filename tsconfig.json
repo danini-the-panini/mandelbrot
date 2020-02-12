@@ -4,8 +4,9 @@
     "emitDecoratorMetadata": true,
     "experimentalDecorators": true,
     "lib": ["es6", "dom", "WebWorker"],
-    "module": "es6",
+    "module": "esNext",
     "moduleResolution": "node",
+    "esModuleInterop": true,
     "baseUrl": ".",
     "paths": {
         "*": ["node_modules/*", "app/javascript/*"]
@@ -14,6 +15,7 @@
     "target": "es5"
   },
   "exclude": [
+    "**/*.asm.ts",
     "**/*.spec.ts",
     "node_modules",
     "vendor",
