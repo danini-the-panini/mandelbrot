@@ -6,6 +6,8 @@ uniform int height;
 const float zoom = 150.0;
 const int iterations = 570;
 
+// bitwise operations from: https://gist.github.com/EliCDavis/f35a9e4afb8e1c9ae94cce8f3c2c9b9a
+
 int OR(int n1, int n2){
 
     float v1 = float(n1);
