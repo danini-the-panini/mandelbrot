@@ -50,11 +50,12 @@ class Tally {
 }
 
 export default class extends Controller {
+  static targets = ['canvas', 'output']
+
   canvasTarget: HTMLCanvasElement
   ctx: CanvasRenderingContext2D
   image: ImageData
-
-  static targets = ['canvas']
+  outputTarget: Element
 
   get height(): number {
     return this.canvasTarget.height
