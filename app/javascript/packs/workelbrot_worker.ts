@@ -21,5 +21,5 @@ onmessage = function (event: MessageEvent) {
 
   console.log('work done')
 
-  postMessage([image, workerIndex], null)
+  self.postMessage([image, workerIndex])
 }
