@@ -1,5 +1,5 @@
 process.env.NODE_ENV = process.env.NODE_ENV || 'production'
 
-const environment = require('./environment')
+const environments = require('./environment')
 
-module.exports = environment.toWebpackConfig()
+module.exports = environments.map(e => e.toWebpackConfig())
