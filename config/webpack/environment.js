@@ -26,12 +26,12 @@ appEnv.entry = new ConfigObject(environment.entry)
 for (let key in appEnv.entry) {
   if (key.endsWith('_worker')) appEnv.entry.delete(key)
 }
-appEnv.entry.delete('application')
 
 workerEnv.entry = new ConfigObject(environment.entry)
-workerEnv.config.set('target', 'webworker')
-for (let key in appEnv.entry) {
-  if (!key.endsWith('_worker')) appEnv.entry.delete(key)
+for (let key in workerEnv.entry) {
+  if (!key.endsWith('_worker')) workerEnv.entry.delete(key)
 }
+workerEnv.config = new ConfigObject(environment.config)
+workerEnv.config.set('target', 'webworker')
 
 module.exports = [appEnv, workerEnv]
