@@ -18,7 +18,8 @@ export default class extends ApplicationController {
   }
 
   initWorkers() {
-    this.workers = new Array(Math.floor(navigator.hardwareConcurrency * 2))
+    let cpus = navigator.hardwareConcurrency || 8
+    this.workers = new Array(Math.floor(cpus * 2))
 
     for (let i = 0; i < this.workers.length; i++) {
       let worker = new Worker('/workelbrot_worker.js')
