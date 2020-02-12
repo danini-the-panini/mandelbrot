@@ -1,24 +1,11 @@
-# README
+# Mandelbrot Experiments
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+I know, it's a rails project. This started out with me seeing how Typescript works with Rails + Stimulus, and very quickly evolved into having fun with canvas, web workers, and webgl.
 
-Things you may want to cover:
+# How to get started
 
-* Ruby version
-
-* System dependencies
-
-* Configuration
-
-* Database creation
-
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
-
-* ...
+1. clone
+2. `bin/setup`
+3. `bin/rails s`
+4. Go to `localhost:3000` in your favourite browser
+5. Click on some links, click the "Run" button and see things work (or break, depending on your browser)
