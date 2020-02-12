@@ -10,6 +10,10 @@
   </head>
 
   <body>
+    <nav>
+      <%= link_to 'Mandelbrot', page_path('mandelbrot') %>
+      <%= link_to 'Population', page_path('population') %>
+    </nav>
     <%= yield %>
   </body>
 </html>
