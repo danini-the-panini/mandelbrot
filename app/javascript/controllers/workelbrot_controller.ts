@@ -1,49 +1,28 @@
-import { Controller, Context } from "stimulus"
-import { prelog, clearlog } from "utils/prelog"
+import ApplicationController from "./application"
+import Deferred from "utils/deferred"
 
-export default class extends Controller {
-  static targets = ['canvas', 'output']
-
-  canvasTarget: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
+export default class extends ApplicationController {
   workers: Worker[]
-  outputTarget: Element
+  deferred: Deferred<void>
 
-  get height(): number {
-    return this.canvasTarget.height
-  }
-
-  get width(): number {
-    return this.canvasTarget.width
-  }
-
-  constructor(context : Context) {
-    super(context)
-    this.onWorkerMessage = this.onWorkerMessage.bind(this)
-  }
-
-  connect() {
-    this.ctx = this.canvasTarget.getContext('2d')
-
+  perform() {
     if ('Worker' in window) {
+      this.deferred = new Deferred()
+
       this.initWorkers()
+
+      return this.deferred.promise;
+    } else {
+      this.prelog("*** ERROR: Your browser does not support Web Workers! ***")
     }
   }
 
-  disconnect() {
-    this.ctx = null
-    clearlog(this.outputTarget)
-  }
-
   initWorkers() {
-    clearlog(this.outputTarget)
-    prelog(this.outputTarget, "Beginning work...")
-
-    this.workers = new Array(navigator.hardwareConcurrency)
+    this.workers = new Array(Math.floor(navigator.hardwareConcurrency * 2))
 
     for (let i = 0; i < this.workers.length; i++) {
       let worker = new Worker('/workelbrot_worker.js')
-      worker.onmessage = this.onWorkerMessage
+      worker.onmessage = this.onWorkerMessage.bind(this)
       worker.postMessage([this.width, this.height, this.workers.length, i])
       this.workers[i] = worker
     }
@@ -53,7 +32,7 @@ export default class extends Controller {
     let image: ImageData = event.data[0]
     let workerIndex: number = event.data[1]
 
-    prelog(this.outputTarget, `Worker done ${workerIndex}`)
+    this.prelog(`Worker done ${workerIndex}`)
 
     let rowsPerWorker = (this.height / this.workers.length)
     let offset = workerIndex * rowsPerWorker
@@ -67,6 +46,6 @@ export default class extends Controller {
       if (worker) return;
     }
 
-    prelog(this.outputTarget, "Work done")
+    this.deferred.resolve()
   }
 }

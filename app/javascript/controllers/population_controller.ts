@@ -1,4 +1,4 @@
-import { Controller } from "stimulus"
+import ApplicationController from "./application"
 
 const ITER = 1000
 const WARMUP = 1000
@@ -27,11 +27,6 @@ interface TallyEntry {
   count : number
 }
 
-interface CycleEntry {
-  number: number
-  freq: number
-}
-
 class Tally {
   entries : TallyEntry[]
 
@@ -49,27 +44,18 @@ class Tally {
   }
 }
 
-export default class extends Controller {
-  static targets = ['canvas', 'output']
-
-  canvasTarget: HTMLCanvasElement
-  ctx: CanvasRenderingContext2D
+export default class extends ApplicationController {
   image: ImageData
-  outputTarget: Element
-
-  get height(): number {
-    return this.canvasTarget.height
-  }
-
-  get width(): number {
-    return this.canvasTarget.width
-  }
 
   connect() {
-    this.ctx = this.canvasTarget.getContext('2d')
-    this.image = this.ctx.createImageData(this.width, this.height)
+    super.connect()
 
-    this.draw()
+    this.image = this.ctx.createImageData(this.width, this.height)
+  }
+
+  disconnect() {
+    super.disconnect()
+    this.image = null
   }
 
   lToX(l : number) {
@@ -83,7 +69,7 @@ export default class extends Controller {
     return lerp(LAMBDA_START, LAMBDA_END, x / this.width)
   }
 
-  async draw() {
+  async perform() {
     let t = new Tally()
 
     this.ctx.fillStyle = 'white'

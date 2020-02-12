@@ -6,7 +6,7 @@ onmessage = function (event: MessageEvent) {
 
   let [width, height, numWorkers, workerIndex] = event.data as Array<number>
 
-  let rowsPerWorker = (height / numWorkers)
+  let rowsPerWorker = Math.ceil(height / numWorkers)
   let offset = workerIndex * rowsPerWorker
 
   let image = new ImageData(width, rowsPerWorker)

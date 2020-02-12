@@ -1,4 +1,4 @@
-const MAX_ITER = 570
+const MAX_ITER = 100000
 const ZOOM = 150.0
 
 export default function mandelbrot(x: number, y: number, { iterations = MAX_ITER, zoom = ZOOM } = {}): number {
