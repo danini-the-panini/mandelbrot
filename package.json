@@ -1,9 +1,7 @@
 {
-  "name": "ts_rails",
+  "name": "mandelbrot",
   "private": true,
   "dependencies": {
-    "@rails/actioncable": "^6.0.0",
-    "@rails/activestorage": "^6.0.0",
     "@rails/ujs": "^6.0.0",
     "@rails/webpacker": "4.2.2",
     "@types/webpack-env": "^1.15.1",
