@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Vite + TS</title>
+  </head>
+  <body data-controller="navigation">
+    <nav>
+      <a href="#mandelbrot" data-action="navigation#navigate">Mandelbrot</a>
+      <a href="#workelbrot" data-action="navigation#navigate">Mandelbrot (Workers)</a>
+      <a href="#webgelbrot1" data-action="navigation#navigate">Mandelbrot (WebGL)</a>
+      <a href="#webgelbrot" data-action="navigation#navigate">Mandelbrot (WebGL 2)</a>
+      <a href="#wasmelbrot" data-action="navigation#navigate">Mandelbrot (WASM)</a>
+      <a href="#wasmorkelbrot" data-action="navigation#navigate">Mandelbrot (WASM Workers)</a>
+      <a href="#population" data-action="navigation#navigate">Population</a>
+    </nav>
+    <template data-navigation-target="template">
+      <div id="controller">
+        <p><canvas id="canvas" width="800" height="600"></canvas></p>
+        <p><button id="run_button">Run!</button></p>
+        <p><pre id="output"></pre></p>
+      </div>
+    </template>
+    <div data-navigation-target="app">
+      <h1>Pick a Thing!</h1>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

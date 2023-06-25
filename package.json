@@ -1,19 +1,22 @@
 {
   "name": "mandelbrot",
   "private": true,
-  "dependencies": {
-    "@rails/ujs": "^6.0.0",
-    "@rails/webpacker": "4.2.2",
-    "@types/webpack-env": "^1.15.1",
-    "raw-loader": "^4.0.0",
-    "stimulus": "^1.1.1",
-    "ts-loader": "^6.2.1",
-    "turbolinks": "^5.2.0",
-    "typescript": "^3.7.5"
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "yarn asbuild:debug && vite",
+    "build": "yarn asbuild:release && tsc && vite build",
+    "preview": "vite preview",
+    "asbuild:debug": "asc as/assembly.ts --target debug",
+    "asbuild:release": "asc as/assembly.ts --target release"
   },
-  "version": "0.1.0",
   "devDependencies": {
-    "assemblyscript": "^0.9.1",
-    "webpack-dev-server": "^3.10.3"
+    "typescript": "^5.0.2",
+    "vite": "^4.3.9"
+  },
+  "dependencies": {
+    "@hotwired/stimulus": "^3.2.1",
+    "assemblyscript": "^0.23.1",
+    "stimulus-vite-helpers": "^3.0.1"
   }
 }
