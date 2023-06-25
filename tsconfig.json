@@ -1,25 +1,16 @@
 {
   "compilerOptions": {
-    "declaration": false,
-    "emitDecoratorMetadata": true,
-    "experimentalDecorators": true,
-    "lib": ["es6", "dom", "WebWorker"],
-    "module": "esNext",
+    "strict": false,
+    "target": "ESNext",
+    "module": "ESNext",
     "moduleResolution": "node",
+    "allowSyntheticDefaultImports": true,
     "esModuleInterop": true,
-    "baseUrl": ".",
-    "paths": {
-        "*": ["node_modules/*", "app/javascript/*"]
-    },
-    "sourceMap": true,
-    "target": "es5"
+    "types": [
+      "vite/client"
+    ],
+    "noEmit": true,
+    "isolatedModules": true
   },
-  "exclude": [
-    "**/*.asm.ts",
-    "**/*.spec.ts",
-    "node_modules",
-    "vendor",
-    "public"
-  ],
-  "compileOnSave": false
+  "exclude": ["as"]
 }

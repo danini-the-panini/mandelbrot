@@ -1,0 +1,19 @@
+{
+  "targets": {
+    "debug": {
+      "outFile": "src/wasm/assembly.wasm",
+      "textFile": "src/wasm/assembly.wat",
+      "sourceMap": true,
+      "debug": true
+    },
+    "release": {
+      "outFile": "src/wasm/assembly.wasm",
+      "textFile": "src/wasm/assembly.wat",
+      "sourceMap": true,
+      "optimizeLevel": 3,
+      "shrinkLevel": 0,
+      "converge": false,
+      "noAssert": false
+    }
+  }
+}
