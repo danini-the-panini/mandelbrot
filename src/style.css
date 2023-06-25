@@ -1,0 +1,86 @@
+:root { font-family: 'Inter', sans-serif; }
+@supports (font-variation-settings: normal) {
+  :root { font-family: 'Inter var', sans-serif; }
+}
+
+:root {
+  font-size: 100%;
+}
+
+html, body {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+nav {
+  display: flex;
+  gap: 8px;
+}
+
+a + a::before {
+  content: '|';
+  padding-right: 8px;
+}
+
+h1.select {
+  margin-left: 40px;
+}
+
+section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: fit-content;
+  padding: 32px;
+  margin: auto;
+}
+
+section.-running button {
+  pointer-events: none;
+}
+
+section:not(.-running) button .hourglass {
+  display: none;
+}
+
+section.-running button .play {
+  display: none;
+}
+
+header {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+header h1 {
+  margin: 0;
+}
+
+button {
+  font-size: 1.5em;
+  border: none;
+  background: none;
+  cursor: pointer;
+  padding: 0;
+}
+
+button:hover {
+}
+
+main {
+  display: flex;
+  gap: 8px;
+}
+
+canvas {
+  border: 1px solid black;
+}
+
+pre {
+  border: 1px solid black;
+  margin: 0;
+  width: 300px;
+  padding: 8px;
+}

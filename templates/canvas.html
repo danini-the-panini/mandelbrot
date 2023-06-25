@@ -1,0 +1,13 @@
+<section data-controller="{{identifier}}" data-{{identifier}}-running-class="-running">
+  <header>
+    <button data-action="{{identifier}}#run">
+      <span class="hourglass">⏳️</span>
+      <span class="play">▶️</span>
+    </button>
+    <h1>{{title}}</h1>
+  </header>
+  <main>
+    <canvas data-{{identifier}}-target="canvas" width="800" height="600"></canvas>
+    <pre data-{{identifier}}-target="output"></pre>
+  </main>
+</section>

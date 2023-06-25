@@ -3,7 +3,10 @@ import { clearlog, prelog } from "../utils/prelog";
 
 export default abstract class CanvasController extends Controller {
   static targets = ['canvas', 'output']
+
+  static classes = ['running']
   
+  declare readonly runningClass: string;
   declare readonly canvasTarget: HTMLCanvasElement;
   declare readonly outputTarget: Element;
   
@@ -44,6 +47,7 @@ export default abstract class CanvasController extends Controller {
   async initialize() {}
 
   async run() {
+    this.element.classList.add(this.runningClass)
     this.clearlog()
     this.prelog("Initializing...")
     await this.initialize()
@@ -58,5 +62,6 @@ export default abstract class CanvasController extends Controller {
 
     this.prelog("Work done")
     this.prelog(`Took ${elapesed} seconds`)
+    this.element.classList.remove(this.runningClass)
   }
 }

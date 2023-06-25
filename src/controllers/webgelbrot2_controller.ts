@@ -1,19 +1,18 @@
 import CanvasController from "./canvas_controller"
 import delay from "../utils/delay"
 
-import vertexShaderSource from "../shaders/basic1.vert?raw"
-import fragmentShaderSource from "../shaders/mandelbrot1.frag?raw"
+import vertexShaderSource from "../shaders/basic.vert?raw"
+import fragmentShaderSource from "../shaders/mandelbrot.frag?raw"
 
 export default class extends CanvasController {
-  gl!: WebGLRenderingContext
+  gl!: WebGL2RenderingContext
   program!: WebGLProgram
   vao!: WebGLVertexArrayObject
   widthLocation!: WebGLUniformLocation
   heightLocation!: WebGLUniformLocation
-  buffer!: WebGLBuffer
 
   connect() {
-    this.gl = this.canvasTarget.getContext('webgl')!
+    this.gl = this.canvasTarget.getContext('webgl2')!
     let vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource)
     let fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource)
     this.program = this.createProgram(vertexShader, fragmentShader)
@@ -22,8 +21,8 @@ export default class extends CanvasController {
     this.widthLocation = this.gl.getUniformLocation(this.program, 'width')!
     this.heightLocation = this.gl.getUniformLocation(this.program, 'height')!
 
-    this.buffer = this.gl.createBuffer()!
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer)
+    let positionBuffer = this.gl.createBuffer()
+    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, positionBuffer)
 
     let positions = [
       -1, -1,
@@ -33,6 +32,8 @@ export default class extends CanvasController {
     ]
     this.gl.bufferData(this.gl.ARRAY_BUFFER, new Float32Array(positions), this.gl.STATIC_DRAW)
 
+    this.vao = this.gl.createVertexArray()!
+    this.gl.bindVertexArray(this.vao)
     this.gl.enableVertexAttribArray(positionAttributeLocation)
 
     let size = 2             // 2 components per iteration
@@ -60,7 +61,7 @@ export default class extends CanvasController {
     this.gl.uniform1i(this.widthLocation, this.width)
     this.gl.uniform1i(this.heightLocation, this.height)
 
-    this.gl.bindBuffer(this.gl.ARRAY_BUFFER, this.buffer)
+    this.gl.bindVertexArray(this.vao)
 
     let primitiveType = this.gl.TRIANGLE_STRIP
     let offset = 0
