@@ -1,11 +1,11 @@
 import CanvasController from "./canvas_controller"
 import setRGB from "../utils/setrgb"
-import delay from "../utils/delay"
+import { ITERATIONS, ZOOM } from "../utils/constants"
 
 import assembly from '../wasm/assembly.wasm?init'
 import wasmSupported from "../utils/wasmSupported"
 
-type MandelbrotFn = (x: number, y: number, widtH: number, height: number) => number
+type MandelbrotFn = (x: number, y: number, widtH: number, height: number, iterations: number, zoom: number) => number
 
 export default class extends CanvasController {
   image!: ImageData | null
@@ -33,7 +33,7 @@ export default class extends CanvasController {
 
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        let rgb = this.mandelbrot(x, y, this.width, this.height)
+        let rgb = this.mandelbrot(x, y, this.width, this.height, ITERATIONS, ZOOM)
         setRGB(this.image, x, y, rgb)
       }
     }

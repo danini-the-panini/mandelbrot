@@ -1,5 +1,6 @@
 import CanvasController from "./canvas_controller"
 import delay from "../utils/delay"
+import { ITERATIONS, ZOOM } from "../utils/constants"
 
 import vertexShaderSource from "../shaders/basic.vert?raw"
 import fragmentShaderSource from "../shaders/mandelbrot.frag?raw"
@@ -70,8 +71,8 @@ export default class extends CanvasController {
     this.gl.uniform1i(this.widthLocation, this.width)
     this.gl.uniform1i(this.heightLocation, this.height)
 
-    this.gl.uniform1f(this.zoomLocation, 150)
-    this.gl.uniform1i(this.iterationsLocation, 570)
+    this.gl.uniform1f(this.zoomLocation, ZOOM)
+    this.gl.uniform1i(this.iterationsLocation, ITERATIONS)
 
     this.gl.bindVertexArray(this.vao)
   }

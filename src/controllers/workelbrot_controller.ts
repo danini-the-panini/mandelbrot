@@ -1,5 +1,6 @@
 import CanvasController from "./canvas_controller"
 import Deferred from "../utils/deferred"
+import { ITERATIONS, ZOOM } from "../utils/constants"
 
 import Workelbrot from '../workers/workelbrot?worker'
 
@@ -27,7 +28,7 @@ export default class extends CanvasController {
     for (let i = 0; i < this.workers.length; i++) {
       let worker = new Workelbrot()
       worker.onmessage = this.onWorkerMessage.bind(this)
-      worker.postMessage([this.width, this.height, this.workers.length, i])
+      worker.postMessage([this.width, this.height, ITERATIONS, ZOOM, this.workers.length, i])
       this.workers[i] = worker
     }
   }

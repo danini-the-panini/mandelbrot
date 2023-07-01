@@ -1,9 +1,9 @@
 /// <reference types="@webgpu/types" />
 
 import CanvasController from "./canvas_controller"
+import { ITERATIONS, ZOOM } from "../utils/constants"
 
 import shaderSource from "../shaders/mandelbrot.wgsl?raw"
-import animationFrame from "../utils/animationFrame"
 
 export default class extends CanvasController {
   adapter: GPUAdapter
@@ -83,9 +83,9 @@ export default class extends CanvasController {
     new Float32Array(arrayBuffer, 0).set([
       this.width,
       this.height,
-      150
+      ZOOM
     ]);
-    new Uint32Array(arrayBuffer, (1 + 1 + 1) * Float32Array.BYTES_PER_ELEMENT).set([570]);
+    new Uint32Array(arrayBuffer, (1 + 1 + 1) * Float32Array.BYTES_PER_ELEMENT).set([ITERATIONS]);
     this.device.queue.writeBuffer(this.uniformBuffer, 0, arrayBuffer);
   }
 
