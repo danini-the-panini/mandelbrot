@@ -31,7 +31,14 @@ export default abstract class CanvasController extends Controller {
 
   connect() {
     this.ctx = this.canvasTarget.getContext('2d')
+    this.updateCanvasSize()
     this.clearCanvas();
+  }
+
+  updateCanvasSize() {
+    const devicePixelRatio = window.devicePixelRatio || 1
+    this.canvasTarget.width = this.canvasTarget.clientWidth * devicePixelRatio
+    this.canvasTarget.height = this.canvasTarget.clientHeight * devicePixelRatio
   }
 
   clearCanvas() {

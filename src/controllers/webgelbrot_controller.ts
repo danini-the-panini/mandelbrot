@@ -18,7 +18,10 @@ export default class extends CanvasController {
   connect() {
     this.gl = this.canvasTarget.getContext('webgl2')!
     if (!this.gl) this.prelog('*** error: no webgl2 ***')
+
     this.timerEXT = this.gl.getExtension('EXT_disjoint_timer_query_webgl2') || this.gl.getExtension('EXT_disjoint_timer_query')
+
+    this.updateCanvasSize()
 
     let vertexShader = this.createShader(this.gl.VERTEX_SHADER, vertexShaderSource)
     let fragmentShader = this.createShader(this.gl.FRAGMENT_SHADER, fragmentShaderSource)
@@ -52,10 +55,6 @@ export default class extends CanvasController {
     let stride = 0           // 0 = move forward size * sizeof(type) each iteration to get the next position
     let offset = 0           // start at the beginning of the buffer
     this.gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
-  }
-
-  disconnect() {
-    super.disconnect()
   }
 
   clearCanvas() {

@@ -1,8 +1,8 @@
 export default {
   mandelbrot: 'Vanilla',
   workelbrot: 'WebWorkers',
-  // webgelbrot1: 'WebGL 1',
   webgelbrot: 'WebGL',
+  webgpulbrot: 'WebGPU',
   wasmelbrot: 'WASM',
   wasmorkelbrot: 'WASM WebWorkers',
 };
