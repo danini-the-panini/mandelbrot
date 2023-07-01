@@ -82,6 +82,7 @@ main {
 }
 
 canvas {
+  background-image: url('/mandelbg.svg');
   border: 1px solid black;
 }
 
