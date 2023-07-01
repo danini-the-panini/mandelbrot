@@ -7,17 +7,17 @@ export default class extends CanvasController {
   workers: Array<Worker | null> = []
   deferred!: Deferred<void>
 
+  connect() {
+    if (!('Worker' in window)) this.prelog('*** error: no web workers ***')
+    super.connect()
+  }
+
   perform() {
-    if ('Worker' in window) {
-      this.deferred = new Deferred()
+    this.deferred = new Deferred()
 
-      this.initWorkers()
+    this.initWorkers()
 
-      return this.deferred.promise;
-    } else {
-      this.prelog("*** ERROR: Your browser does not support Web Workers! ***")
-      return Promise.resolve()
-    }
+    return this.deferred.promise;
   }
 
   initWorkers() {

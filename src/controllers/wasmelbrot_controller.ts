@@ -3,6 +3,7 @@ import setRGB from "../utils/setrgb"
 import delay from "../utils/delay"
 
 import assembly from '../wasm/assembly.wasm?init'
+import wasmSupported from "../utils/wasmSupported"
 
 type MandelbrotFn = (x: number, y: number, widtH: number, height: number) => number
 
@@ -11,6 +12,7 @@ export default class extends CanvasController {
   mandelbrot: MandelbrotFn
 
   async connect() {
+    if (!wasmSupported()) this.prelog('*** error: no wasm ***')
     super.connect()
     this.image = this.ctx?.createImageData(this.width, this.height)!
     let instance = await assembly({})
@@ -23,7 +25,6 @@ export default class extends CanvasController {
   }
 
   async perform() {
-    await delay(1)
     this.draw()
   }
 

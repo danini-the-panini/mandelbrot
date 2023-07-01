@@ -1,5 +1,6 @@
 import { Controller } from "@hotwired/stimulus";
 import { clearlog, prelog } from "../utils/prelog";
+import delay from "../utils/delay";
 
 export default abstract class CanvasController extends Controller {
   static targets = ['canvas', 'output']
@@ -42,26 +43,31 @@ export default abstract class CanvasController extends Controller {
     clearlog(this.outputTarget)
   }
 
+  async beforePerform() : Promise<void> {}
   abstract perform() : Promise<void>;
-
-  async initialize() {}
 
   async run() {
     this.element.classList.add(this.runningClass)
     this.clearlog()
     this.prelog("Initializing...")
-    await this.initialize()
     this.clearCanvas()
+    await this.beforePerform()
     this.prelog("Beginning work...")
 
-    let t1 = new Date()
-    await this.perform()
-    let t2 = new Date()
-
-    let elapesed = (t2.getTime() - t1.getTime()) / 1000
+    await delay(1)
+    let elapsed = await this.withTiming(() => this.perform())
 
     this.prelog("Work done")
-    this.prelog(`Took ${elapesed} seconds`)
+    if (elapsed !== null) {
+      this.prelog(`Took ${elapsed} seconds`)
+    }
     this.element.classList.remove(this.runningClass)
+  }
+
+  async withTiming(fn: () => Promise<void>): Promise<number | null> {
+    let t1 = performance.now()
+    await fn()
+    let t2 = performance.now()
+    return (t2 - t1) / 1000
   }
 }

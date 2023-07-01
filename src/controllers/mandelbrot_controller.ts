@@ -17,7 +17,6 @@ export default class extends CanvasController {
   }
 
   async perform() {
-    await delay(1)
     this.draw()
   }
 

@@ -18,9 +18,16 @@ nav {
   gap: 8px;
 }
 
+a.home {
+  text-decoration: none;
+}
+
 a + a::before {
   content: '|';
   padding-right: 8px;
+  pointer-events: none;
+  display: inline-block;
+  color: lightslategray;
 }
 
 h1.select {

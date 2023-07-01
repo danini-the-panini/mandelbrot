@@ -5,8 +5,8 @@ precision highp float;
 uniform int width;
 uniform int height;
 
-const float zoom = 150.0;
-const int iterations = 570;
+uniform float zoom;
+uniform int iterations;
 
 out vec4 color;
 

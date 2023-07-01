@@ -2,22 +2,24 @@ import CanvasController from "./canvas_controller"
 import Deferred from "../utils/deferred"
 
 import Wasmorkelbrot from '../workers/wasmorkelbrot?worker'
+import wasmSupported from "../utils/wasmSupported"
 
 export default class extends CanvasController {
   workers: Array<Worker | null> = []
   deferred!: Deferred<void>
 
+  connect() {
+    if (!('Worker' in window)) this.prelog('*** error: no web workers ***')
+    if (!wasmSupported()) this.prelog('*** error: no wasm ***')
+    super.connect()
+  }
+
   perform() {
-    if ('Worker' in window) {
-      this.deferred = new Deferred()
+    this.deferred = new Deferred()
 
-      this.initWorkers()
+    this.initWorkers()
 
-      return this.deferred.promise;
-    } else {
-      this.prelog("*** ERROR: Your browser does not support Web Workers! ***")
-      return Promise.resolve()
-    }
+    return this.deferred.promise;
   }
 
   initWorkers() {
