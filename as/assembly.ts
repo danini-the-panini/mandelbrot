@@ -1,4 +1,4 @@
-export default function mandelbrot(x: f64, y: f64, width: f64, height: f64, iterations: u32, zoom: f64): i32 {
+export default function mandelbrot(x: f64, y: f64, width: f64, height: f64, iterations: u32, zoom: f64): u32 {
   let zx: f64 = 0.0
   let zy: f64 = 0.0
   let cX: f64 = (x - width / 2.0) / zoom
@@ -13,5 +13,5 @@ export default function mandelbrot(x: f64, y: f64, width: f64, height: f64, iter
     iter--
   }
 
-  return iter | (iter << 8)
+  return iter
 }

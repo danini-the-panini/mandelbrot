@@ -1,56 +1,45 @@
 import CanvasController from "./canvas_controller"
-import Deferred from "../utils/deferred"
 import { ITERATIONS, ZOOM } from "../utils/constants"
 
 import Workelbrot from '../workers/workelbrot?worker'
+import WorkerHelper from "../utils/WorkerHelper"
+import workerOffset from "../utils/workerOffset"
 
 export default class extends CanvasController {
-  workers: Array<Worker | null> = []
-  deferred!: Deferred<void>
+  workers: Array<WorkerHelper> = []
 
   connect() {
     if (!('Worker' in window)) this.prelog('*** error: no web workers ***')
-    super.connect()
-  }
 
-  perform() {
-    this.deferred = new Deferred()
-
-    this.initWorkers()
-
-    return this.deferred.promise;
-  }
-
-  initWorkers() {
     let cpus = navigator.hardwareConcurrency || 8
     this.workers = new Array(Math.floor(cpus * 2))
 
     for (let i = 0; i < this.workers.length; i++) {
-      let worker = new Workelbrot()
-      worker.onmessage = this.onWorkerMessage.bind(this)
-      worker.postMessage([this.width, this.height, ITERATIONS, ZOOM, this.workers.length, i])
-      this.workers[i] = worker
+      this.workers[i] = new WorkerHelper(this.createWorker(), this.workers.length, i)
     }
+
+    super.connect()
   }
 
-  onWorkerMessage(event: MessageEvent) {
-    let image: ImageData = event.data[0]
-    let workerIndex: number = event.data[1]
+  disconnect() {
+    this.workers.forEach(w => w.terminate())
+    this.workers = []
+  }
 
-    this.prelog(`Worker done ${workerIndex}`)
+  async beforePerform() {
+    await Promise.all(this.workers.map(async w => w.initialize()))
+  }
 
-    let rowsPerWorker = (this.height / this.workers.length)
-    let offset = workerIndex * rowsPerWorker
+  async perform() {
+    await Promise.all(this.workers.map(async w => {
+      const image = await w.perform(this.width, this.height, ITERATIONS, ZOOM)
+      this.prelog(`Worker done ${w.index}`)
+      let [, offset] = workerOffset(this.height, w.index, this.workers.length)
+      this.ctx?.putImageData(image, 0, offset)
+    }))
+  }
 
-    this.workers[workerIndex]!.terminate()
-    this.workers[workerIndex] = null
-
-    this.ctx?.putImageData(image, 0, offset)
-
-    for (let worker of this.workers) {
-      if (worker) return;
-    }
-
-    this.deferred.resolve()
+  createWorker(): Worker {
+    return new Workelbrot()
   }
 }

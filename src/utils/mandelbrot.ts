@@ -13,5 +13,5 @@ export default function mandelbrot(x: number, y: number, width: number, height: 
     iter--
   }
 
-  return iter | (iter << 8)
+  return iter
 }

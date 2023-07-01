@@ -29,9 +29,9 @@ void main() {
 
   int rgb = iter | (iter << 8);
 
-  int r = (rgb >> 16) & 0xFF;
-  int g = (rgb >> 8) & 0xFF;
-  int b = rgb & 0xFF;
+  int a = (rgb >> 16) & 0xFF;
+  int b = (rgb >> 8) & 0xFF;
+  int c = rgb & 0xFF;
 
-  color = vec4(float(r) / 255.0, float(g) / 255.0, float(b) / 255.0, 1.0);
+  color = vec4(float(a) / 255.0, float(c) / 255.0, float(b) / 255.0, 1.0);
 }

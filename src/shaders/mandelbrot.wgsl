@@ -54,9 +54,9 @@ fn fragment_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
 
   let rgb = iter | (iter << 8u);
 
-  let r = (rgb >> 16u) & 0xFFu;
-  let g = (rgb >> 8u) & 0xFFu;
-  let b = rgb & 0xFFu;
+  let a = (rgb >> 16u) & 0xFFu;
+  let b = (rgb >> 8u) & 0xFFu;
+  let c = rgb & 0xFFu;
 
-  return vec4<f32>(f32(r) / 255.0, f32(g) / 255.0, f32(b) / 255.0, 1.0);
+  return vec4<f32>(f32(a) / 255.0, f32(c) / 255.0, f32(b) / 255.0, 1.0);
 }
