@@ -1,4 +1,4 @@
-import BaseWorker from "../utils/BaseWorker"
+import BaseWorker from "./BaseWorker"
 import setRGB from "../utils/setrgb"
 import workerOffset from "../utils/workerOffset"
 
@@ -6,7 +6,7 @@ import assembly from '../wasm/assembly.wasm?init'
 
 type MandelbrotFn = (x: number, y: number, widtH: number, height: number, iterations: number, zoom: number) => number
 
-class Wasmorkelbrot extends BaseWorker {
+class Wasmelworker extends BaseWorker {
   mandelbrot: MandelbrotFn
 
   async initialize(numWorkers: number, workerIndex: number): Promise<void> {
@@ -33,4 +33,4 @@ class Wasmorkelbrot extends BaseWorker {
   }
 }
 
-(new Wasmorkelbrot()).start()
+(new Wasmelworker()).start()

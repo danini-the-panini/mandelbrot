@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/mandelicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Mandelbrot rendering experiment" />
+    <meta name="og:image" content="https://mandelbrot.danini.dev/ogimage.png" />
+    <title>Mandelbrot</title>
+  </head>
+  <body
+    data-controller="mandelbrot"
+    data-mandelbrot-running-class="-running"
+    data-mandelbrot-loading-class="-loading"
+    data-mandelbrot-error-class="-error"
+    data-action="resize@window->mandelbrot#layout:passive"
+  >
+    <header>
+      <button data-mandelbrot-target="run" data-action="mandelbrot#run">
+      </button>
+      <select data-mandelbrot-target="impl" data-action="mandelbrot#switchImpl">
+      </select>
+      <input
+        id="iterations"
+        data-action="
+          input->mandelbrot#updateIterations
+          input->mandelbrot#render
+          change->mandelbrot#autorun
+        "
+        type="range"
+        min="80"
+        max="180"
+        value="100"
+        data-mandelbrot-target="iterations"
+      />
+      <label for="iterations">
+        <span data-mandelbrot-target="iterationsDisplay">N</span>
+        iterations
+      </label>
+      <div class="message" data-mandelbrot-target="message">Ready!</div>
+    </header>
+
+    <main data-mandelbrot-target="output">
+    </main>
+
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

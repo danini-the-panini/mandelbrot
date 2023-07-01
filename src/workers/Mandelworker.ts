@@ -1,9 +1,9 @@
-import BaseWorker from "../utils/BaseWorker"
+import BaseWorker from "./BaseWorker"
 import mandelbrot from "../utils/mandelbrot"
 import setRGB from "../utils/setrgb"
 import workerOffset from "../utils/workerOffset"
 
-class Workelbrot extends BaseWorker {
+class Mandelworker extends BaseWorker {
   async perform(width: number, height: number, iterations: number, zoom: number): Promise<ImageData> {
     let [rows, offset] = workerOffset(height, this.index, this.numWorkers)
 
@@ -21,4 +21,4 @@ class Workelbrot extends BaseWorker {
   }
 }
 
-(new Workelbrot()).start()
+(new Mandelworker()).start()

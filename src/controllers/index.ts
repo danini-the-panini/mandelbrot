@@ -1,9 +1,6 @@
-// Load all the controllers within this directory and all subdirectories. 
-// Controller files must be named *_controller.js.
-
 import { Application } from "@hotwired/stimulus"
-import { registerControllers } from 'stimulus-vite-helpers'
 
 const application = Application.start()
-const controllers = import.meta.glob('./**/*_controller.ts', { eager: true })
-registerControllers(application, controllers)
+
+import MandelbrotController from './mandelbrot_controller'
+application.register('mandelbrot', MandelbrotController)

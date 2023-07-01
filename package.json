@@ -4,17 +4,14 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"yarn html:watch\" \"yarn wasm:watch\" \"vite\"",
-    "build": "yarn html:build && yarn wasm:build && tsc && vite build",
+    "dev": "concurrently \"yarn wasm:watch\" \"vite\"",
+    "build": "yarn wasm:build && tsc && vite build",
     "preview": "vite preview",
-    "clean": "rm -rf dist && yarn wasm:clean && yarn html:clean",
+    "clean": "rm -rf dist && yarn wasm:clean",
     "wasm:watch": "nodemon --ext ts --watch ./as --exec \"yarn wasm:build\"",
     "wasm:debug": "asc as/assembly.ts --target debug",
     "wasm:build": "asc as/assembly.ts --target release",
-    "wasm:clean": "rm src/wasm/assembly.*",
-    "html:build": "node ./buildhtml.js",
-    "html:watch": "nodemon --ext html --watch ./templates --exec \"yarn html:build\"",
-    "html:clean": "rm pages/*.html"
+    "wasm:clean": "rm src/wasm/assembly.*"
   },
   "devDependencies": {
     "@types/node": "^20.3.1",

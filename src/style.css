@@ -21,62 +21,26 @@ html, body {
   display: flex;
   flex-direction: column;
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
 *, *::before, *::after {
   box-sizing: inherit;
 }
 
-nav {
-  display: flex;
-  gap: 8px;
-}
-
-a.home {
-  text-decoration: none;
-}
-
-a + a::before {
-  content: '|';
-  padding-right: 8px;
-  pointer-events: none;
-  display: inline-block;
-  color: lightslategray;
-}
-
-h1.select {
-  margin-left: 40px;
-}
-
-section {
+body {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  width: fit-content;
-  padding: 32px;
-  margin: auto;
-}
-
-section.-running button {
-  pointer-events: none;
-}
-
-section:not(.-running) button .hourglass {
-  display: none;
-}
-
-section.-running button .play {
-  display: none;
 }
 
 header {
   display: flex;
   gap: 16px;
   align-items: center;
-}
-
-header h1 {
-  margin: 0;
+  padding: 0.5rem;
+  /* box-shadow: inset 0 0px 0 1px black; */
+  border-bottom: 1px solid black;
 }
 
 button {
@@ -87,30 +51,52 @@ button {
   padding: 0;
 }
 
-button:hover {
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+body.-running button {
+  pointer-events: none;
+}
+
+body:not(.-running) button::before {
+  content: '▶️'
+}
+
+body.-running button::before {
+  content: '⏳️'
 }
 
 main {
+  background-image: url('/mandelbg.svg');
+  background-size: 50rem 37.5rem;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-grow: 1;
+  position: relative;
   display: flex;
-  gap: 8px;
 }
 
 canvas {
-  background-image: url('/mandelbg.svg');
-  border: 1px solid black;
-  align-self: flex-start;
-}
-
-.output {
-  border: 1px solid black;
-  align-self: stretch;
-}
-
-pre {
+  flex-grow: 1;
+  width: 0;
   height: 0;
+  min-width: 100%;
   min-height: 100%;
-  margin: 0;
-  width: 300px;
-  padding: 8px;
-  overflow: auto;
+}
+
+.message {
+  margin-left: auto;
+  color: gray;
+  font-style: italic;
+  font-size: 0.75rem;
+}
+
+body.-error .message {
+  color: red;
+}
+
+body.-error main {
+  background: repeating-linear-gradient(-45deg, rgba(255, 0, 0, 0.25), rgba(255, 0, 0, 0.25) 0.5rem, transparent 0.5rem, transparent 1rem);
 }
