@@ -3,14 +3,21 @@ import { clearlog, prelog } from "../utils/prelog";
 import delay from "../utils/delay";
 
 export default abstract class CanvasController extends Controller {
-  static targets = ['canvas', 'output']
+  static targets = [
+    'canvas',
+    'output',
+    'iterations',
+    'iterationsDisplay'
+  ]
 
   static classes = ['running']
   
   declare readonly runningClass: string;
   declare readonly canvasTarget: HTMLCanvasElement;
   declare readonly outputTarget: Element;
-  
+  declare readonly iterationsTarget: HTMLInputElement;
+  declare readonly iterationsDisplayTarget: Element;
+
   ctx: CanvasRenderingContext2D | null;
 
   get height(): number {
@@ -19,6 +26,12 @@ export default abstract class CanvasController extends Controller {
 
   get width(): number {
     return this.canvasTarget.width
+  }
+
+  get iterations(): number {
+    const n = parseInt(this.iterationsTarget.value, 10)
+
+    return Math.round(Math.pow(2, n / 10))
   }
 
   prelog(message: string) {
@@ -33,6 +46,10 @@ export default abstract class CanvasController extends Controller {
     this.ctx = this.canvasTarget.getContext('2d')
     this.updateCanvasSize()
     this.clearCanvas();
+  }
+
+  iterationsTargetConnected() {
+    this.updateIterations()
   }
 
   updateCanvasSize() {
@@ -50,11 +67,16 @@ export default abstract class CanvasController extends Controller {
     clearlog(this.outputTarget)
   }
 
+  updateIterations() {
+    this.iterationsDisplayTarget.textContent = this.iterations.toString()
+  }
+
   async beforePerform() : Promise<void> {}
   abstract perform() : Promise<void>;
 
   async run() {
-    this.element.classList.add(this.runningClass)
+    this.beforeRun()
+
     this.clearlog()
     this.prelog("Initializing...")
     this.clearCanvas()
@@ -68,7 +90,19 @@ export default abstract class CanvasController extends Controller {
     if (elapsed !== null) {
       this.prelog(`Took ${elapsed} seconds`)
     }
+    this.afterRun()
+  }
+
+  autoRun() {}
+
+  beforeRun() {
+    this.iterationsTarget.disabled = true
+    this.element.classList.add(this.runningClass)
+  }
+
+  afterRun() {
     this.element.classList.remove(this.runningClass)
+    this.iterationsTarget.disabled = false
   }
 
   async withTiming(fn: () => Promise<void>): Promise<number | null> {

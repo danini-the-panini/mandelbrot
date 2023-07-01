@@ -1,6 +1,6 @@
 import CanvasController from "./canvas_controller"
 import delay from "../utils/delay"
-import { ITERATIONS, ZOOM } from "../utils/constants"
+import { ZOOM } from "../utils/constants"
 
 import vertexShaderSource from "../shaders/basic.vert?raw"
 import fragmentShaderSource from "../shaders/mandelbrot.frag?raw"
@@ -56,11 +56,15 @@ export default class extends CanvasController {
     let stride = 0           // 0 = move forward size * sizeof(type) each iteration to get the next position
     let offset = 0           // start at the beginning of the buffer
     this.gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
+    this.run()
   }
 
-  clearCanvas() {
-    this.gl.clearColor(1, 1, 1, 0)
+  updateIterations() {
+    super.updateIterations()
+    if (this.gl) this.run()
   }
+
+  clearCanvas() {}
 
   async beforePerform() {
     this.gl.viewport(0, 0, this.width, this.height)
@@ -72,7 +76,7 @@ export default class extends CanvasController {
     this.gl.uniform1i(this.heightLocation, this.height)
 
     this.gl.uniform1f(this.zoomLocation, ZOOM)
-    this.gl.uniform1i(this.iterationsLocation, ITERATIONS)
+    this.gl.uniform1i(this.iterationsLocation, this.iterations)
 
     this.gl.bindVertexArray(this.vao)
   }
@@ -143,4 +147,7 @@ export default class extends CanvasController {
     }
     return this.gl.getQueryParameter(query, this.gl.QUERY_RESULT)
   }
+
+  beforeRun() {}
+  afterRun() {}
 }

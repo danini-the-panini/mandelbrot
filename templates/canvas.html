@@ -5,6 +5,19 @@
       <span class="play">▶️</span>
     </button>
     <h1>{{title}}</h1>
+    <label>iterations:</label>
+    <input
+      data-{{identifier}}-target="iterations"
+      data-action="{{identifier}}#updateIterations change->{{identifier}}#autoRun"
+      type="range"
+      min="80"
+      max="180"
+      value="100"
+    />
+    <div>
+      <span data-{{identifier}}-target="iterationsDisplay">N</span>
+      iterations
+    </div>
   </header>
   <main>
     <canvas data-{{identifier}}-target="canvas" width="800" height="600"></canvas>

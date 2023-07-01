@@ -1,7 +1,7 @@
 /// <reference types="@webgpu/types" />
 
 import CanvasController from "./canvas_controller"
-import { ITERATIONS, ZOOM } from "../utils/constants"
+import { ZOOM } from "../utils/constants"
 
 import shaderSource from "../shaders/mandelbrot.wgsl?raw"
 
@@ -74,6 +74,12 @@ export default class extends CanvasController {
         }
       ]
     })
+    this.run()
+  }
+
+  updateIterations() {
+    super.updateIterations()
+    if (this.gctx) this.run()
   }
 
   clearCanvas() {}
@@ -85,7 +91,7 @@ export default class extends CanvasController {
       this.height,
       ZOOM
     ]);
-    new Uint32Array(arrayBuffer, (1 + 1 + 1) * Float32Array.BYTES_PER_ELEMENT).set([ITERATIONS]);
+    new Uint32Array(arrayBuffer, (1 + 1 + 1) * Float32Array.BYTES_PER_ELEMENT).set([this.iterations]);
     this.device.queue.writeBuffer(this.uniformBuffer, 0, arrayBuffer);
   }
 
@@ -96,7 +102,7 @@ export default class extends CanvasController {
       colorAttachments: [
         {
           view: this.gctx.getCurrentTexture().createView(),
-          clearValue: { r: 1.0, g: 0.0, b: 1.0, a: 1.0 },
+          clearValue: { r: 1.0, g: 0.0, b: 1.0, a: 0.0 },
           loadOp: 'clear',
           storeOp: 'store',
         },
@@ -123,4 +129,7 @@ export default class extends CanvasController {
 
     return super.withTiming(fn)
   }
+
+  beforeRun() {}
+  afterRun() {}
 }

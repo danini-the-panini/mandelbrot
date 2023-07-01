@@ -1,5 +1,5 @@
 import CanvasController from "./canvas_controller"
-import { ITERATIONS, ZOOM } from "../utils/constants"
+import { ZOOM } from "../utils/constants"
 
 import Workelbrot from '../workers/workelbrot?worker'
 import WorkerHelper from "../utils/WorkerHelper"
@@ -19,6 +19,7 @@ export default class extends CanvasController {
     }
 
     super.connect()
+    this.run()
   }
 
   disconnect() {
@@ -32,11 +33,15 @@ export default class extends CanvasController {
 
   async perform() {
     await Promise.all(this.workers.map(async w => {
-      const image = await w.perform(this.width, this.height, ITERATIONS, ZOOM)
+      const image = await w.perform(this.width, this.height, this.iterations, ZOOM)
       this.prelog(`Worker done ${w.index}`)
       let [, offset] = workerOffset(this.height, w.index, this.workers.length)
       this.ctx?.putImageData(image, 0, offset)
     }))
+  }
+
+  autoRun() {
+    this.run()
   }
 
   createWorker(): Worker {
