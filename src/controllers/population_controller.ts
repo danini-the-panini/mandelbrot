@@ -1,109 +1,111 @@
-import CanvasController from "./canvas_controller"
+// TODO: put this in some general experiment repo at some point
 
-const ITER = 1000
-const WARMUP = 1000
+// import CanvasController from "./canvas_controller"
 
-const LAMBDA_START = 3.4
-const LAMBDA_END = 4
+// const ITER = 1000
+// const WARMUP = 1000
 
-function delay(ms : number) {
-  return new Promise(r => setTimeout(r, ms))
-}
+// const LAMBDA_START = 3.4
+// const LAMBDA_END = 4
 
-function lerp(x : number, y : number, a : number) {
-  return x + a * (y - x)
-}
+// function delay(ms : number) {
+//   return new Promise(r => setTimeout(r, ms))
+// }
 
-function pop(x : number, lambda : number) {
-  return lambda * x * (1 - x)
-}
+// function lerp(x : number, y : number, a : number) {
+//   return x + a * (y - x)
+// }
 
-function closeTo(x : number, y : number, delta : number = 0.0001) {
-  return Math.abs(x - y) < delta
-}
+// function pop(x : number, lambda : number) {
+//   return lambda * x * (1 - x)
+// }
 
-interface TallyEntry {
-  number : number
-  count : number
-}
+// function closeTo(x : number, y : number, delta : number = 0.0001) {
+//   return Math.abs(x - y) < delta
+// }
 
-class Tally {
-  entries: TallyEntry[] = []
+// interface TallyEntry {
+//   number : number
+//   count : number
+// }
 
-  clear() {
-    this.entries = []
-  }
+// class Tally {
+//   entries: TallyEntry[] = []
 
-  record(x : number) {
-    let e = this.entries.find(n => closeTo(n.number, x))
-    if (!e) this.entries.push({ number: x, count: 1 })
-  }
-}
+//   clear() {
+//     this.entries = []
+//   }
 
-export default class extends CanvasController {
-  image: ImageData | null = null
+//   record(x : number) {
+//     let e = this.entries.find(n => closeTo(n.number, x))
+//     if (!e) this.entries.push({ number: x, count: 1 })
+//   }
+// }
 
-  connect() {
-    super.connect()
+// export default class extends CanvasController {
+//   image: ImageData | null = null
 
-    this.image = this.ctx!.createImageData(this.width, this.height)!
-  }
+//   connect() {
+//     super.connect()
 
-  disconnect() {
-    super.disconnect()
-    this.image = null
-  }
+//     this.image = this.ctx!.createImageData(this.width, this.height)!
+//   }
 
-  lToX(l : number) {
-    return this.width * (
-      (l - LAMBDA_START) /
-      (LAMBDA_END - LAMBDA_START)
-    )
-  }
+//   disconnect() {
+//     super.disconnect()
+//     this.image = null
+//   }
 
-  xToL(x : number) {
-    return lerp(LAMBDA_START, LAMBDA_END, x / this.width)
-  }
+//   lToX(l : number) {
+//     return this.width * (
+//       (l - LAMBDA_START) /
+//       (LAMBDA_END - LAMBDA_START)
+//     )
+//   }
 
-  async perform() {
-    if (!this.ctx) return
+//   xToL(x : number) {
+//     return lerp(LAMBDA_START, LAMBDA_END, x / this.width)
+//   }
 
-    let t = new Tally()
+//   async perform() {
+//     if (!this.ctx) return
 
-    this.ctx.fillStyle = 'white'
-    this.ctx.fillRect(0, 0, this.width, this.height)
+//     let t = new Tally()
 
-    this.ctx.strokeStyle = 'black'
-    this.ctx.beginPath();
-    for (let l = Math.floor(LAMBDA_START); l <= LAMBDA_END; l++) {
-      let x = this.lToX(l)
+//     this.ctx.fillStyle = 'white'
+//     this.ctx.fillRect(0, 0, this.width, this.height)
 
-      this.ctx.moveTo(x, 0)
-      this.ctx.lineTo(x, this.height)
-    }
-    this.ctx.closePath();
-    this.ctx.stroke();
+//     this.ctx.strokeStyle = 'black'
+//     this.ctx.beginPath();
+//     for (let l = Math.floor(LAMBDA_START); l <= LAMBDA_END; l++) {
+//       let x = this.lToX(l)
 
-    this.ctx.fillStyle = 'red';
-    for (let x = 0; x < this.width; x++) {
-      t.clear()
+//       this.ctx.moveTo(x, 0)
+//       this.ctx.lineTo(x, this.height)
+//     }
+//     this.ctx.closePath();
+//     this.ctx.stroke();
 
-      let lamb = this.xToL(x)
+//     this.ctx.fillStyle = 'red';
+//     for (let x = 0; x < this.width; x++) {
+//       t.clear()
 
-      let p = 0.5;
-      for (let i = 0; i < WARMUP; i++) {
-        p = pop(p, lamb)
-      }
-      for (let i = 0; i < ITER; i++) {
-        p = pop(p, lamb)
-        t.record(p)
-      }
+//       let lamb = this.xToL(x)
 
-      t.entries.forEach(({ number: y }) => {
-        this.ctx!.fillRect(x - 1, this.height - y * this.height - 1, 2, 2);
-      })
+//       let p = 0.5;
+//       for (let i = 0; i < WARMUP; i++) {
+//         p = pop(p, lamb)
+//       }
+//       for (let i = 0; i < ITER; i++) {
+//         p = pop(p, lamb)
+//         t.record(p)
+//       }
 
-      await delay(0)
-    }
-  }
-}
+//       t.entries.forEach(({ number: y }) => {
+//         this.ctx!.fillRect(x - 1, this.height - y * this.height - 1, 2, 2);
+//       })
+
+//       await delay(0)
+//     }
+//   }
+// }
