@@ -4,9 +4,16 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/mandelicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Mandelbrot rendering experiment" />
-    <meta name="og:image" content="https://mandelbrot.danini.dev/ogimage.png" />
-    <title>Mandelbrot</title>
+
+    <title>Mandelbrot Rendering Experiment</title>
+    <meta name="description" content="WASM, WebWorkers, WebGL and WebGPU">
+
+    <meta property="og:url" content="https://mandelbrot.danini.dev/">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="Mandelbrot Rendering Experiment">
+    <meta property="og:description" content="WASM, WebWorkers, WebGL and WebGPU">
+    <meta property="og:image" content="https://mandelbrot.danini.dev/ogimage.png">
+    <meta name="twitter:card" content="summary_large_image">
   </head>
   <body
     data-controller="mandelbrot"
@@ -38,6 +45,9 @@
         iterations
       </label>
       <div class="message" data-mandelbrot-target="message">Ready!</div>
+      <a class="repo" href="https://github.com/danini-the-panini/mandelbrot" target="_blank">
+        <img src="/github.svg" width="32" height="32" />
+      </a>
     </header>
 
     <main data-mandelbrot-target="output">
