@@ -1,7 +1,7 @@
 import CanvasController from "./canvas_controller"
 import { ZOOM } from "../utils/constants"
 
-import Workelbrot from '../workers/workelbrot?worker'
+import Workelbrot from '../workers/workelbrot?worker&inline'
 import WorkerHelper from "../utils/WorkerHelper"
 import workerOffset from "../utils/workerOffset"
 

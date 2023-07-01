@@ -1,4 +1,4 @@
-import Wasmorkelbrot from '../workers/wasmorkelbrot?worker'
+import Wasmorkelbrot from '../workers/wasmorkelbrot?worker&inline'
 import wasmSupported from "../utils/wasmSupported"
 import WorkelbrotController from "./workelbrot_controller"
 
