@@ -11,6 +11,11 @@ html, body {
   height: 100%;
   display: flex;
   flex-direction: column;
+  box-sizing: border-box;
+}
+
+*, *::before, *::after {
+  box-sizing: inherit;
 }
 
 nav {
@@ -84,11 +89,19 @@ main {
 canvas {
   background-image: url('/mandelbg.svg');
   border: 1px solid black;
+  align-self: flex-start;
+}
+
+.output {
+  border: 1px solid black;
+  align-self: stretch;
 }
 
 pre {
-  border: 1px solid black;
+  height: 0;
+  min-height: 100%;
   margin: 0;
   width: 300px;
   padding: 8px;
+  overflow: auto;
 }
