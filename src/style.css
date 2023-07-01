@@ -99,4 +99,5 @@ body.-error .message {
 
 body.-error main {
   background: repeating-linear-gradient(-45deg, rgba(255, 0, 0, 0.25), rgba(255, 0, 0, 0.25) 0.5rem, transparent 0.5rem, transparent 1rem);
+  background-size: auto !important;
 }
