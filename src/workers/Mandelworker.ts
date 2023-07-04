@@ -4,15 +4,15 @@ import setRGB from "../utils/setrgb"
 import workerOffset from "../utils/workerOffset"
 
 class Mandelworker extends BaseWorker {
-  async perform(width: number, height: number, iterations: number, zoom: number): Promise<ImageData> {
-    let [rows, offset] = workerOffset(height, this.index, this.numWorkers)
+  async perform(iterations: number, zoom: number): Promise<ImageData> {
+    let [offset, rows] = this.workerOffset()
 
-    let image = new ImageData(width, rows)
+    let image = new ImageData(this.width, rows)
 
     for (let r = 0; r < rows; r++) {
-      for (let x = 0; x < width; x++) {
+      for (let x = 0; x < this.width; x++) {
         let y = r + offset
-        let rgb = mandelbrot(x, y, width, height, iterations, zoom)
+        let rgb = mandelbrot(x, y, this.width, this.height, iterations, zoom)
         setRGB(image, x, r, rgb)
       }
     }

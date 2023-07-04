@@ -14,17 +14,25 @@ export default class WorkerHelper {
     this.calls = {}
   }
 
-  async initialize(): Promise<void> {
-    return this.postMessage('initialize', this.numWorkers, this.index)
+  async initialize(width: number, height: number): Promise<void> {
+    return this.postMessage('initialize', this.numWorkers, this.index, width, height)
   }
 
-  async perform(width: number, height: number, iterations: number, zoom: number): Promise<ImageData> {
-    return this.postMessage('perform', width, height, iterations, zoom)
+  async beforePerform(width: number, height: number): Promise<void> {
+    return this.postMessage('beforePerform', width, height)
+  }
+
+  async perform(iterations: number, zoom: number): Promise<ImageData> {
+    return this.postMessage('perform', iterations, zoom)
+  }
+
+  async afterPerform(): Promise<void> {
+    return this.postMessage('afterPerform')
   }
 
   terminate() { this.worker.terminate() }
 
-  private async postMessage<T>(name: string, ...args: any[]): Promise<T> {
+  private async postMessage<T>(name: string, ...args: [...any]): Promise<T> {
     if (this.calls[name]) return
 
     const deferred = new Deferred<T>()

@@ -1,17 +1,32 @@
+import workerOffset from "../utils/workerOffset"
+
 export default abstract class BaseWorker {
   numWorkers: number
   index: number
+  width: number
+  height: number
 
   start() {
     onmessage = this.onMessage.bind(this)
   }
 
-  async initialize(numWorkers: number, index: number) : Promise<void> {
+  async initialize(numWorkers: number, index: number, width: number, height: number) : Promise<void> {
     this.numWorkers = numWorkers
     this.index = index
+    this.width = width
+    this.height = height
   }
 
-  abstract perform(width: number, height: number, iterations: number, zoom: number) : Promise<ImageData>
+  async beforePerform(width: number, height: number): Promise<void> {
+    this.width = width
+    this.height = height
+  }
+  abstract perform(iterations: number, zoom: number) : Promise<ImageData>
+  async afterPerform(): Promise<void> {}
+
+  protected workerOffset() {
+    return workerOffset(this.height, this.index, this.numWorkers)
+  }
 
   private async onMessage(event: MessageEvent) {
     const [name, ...args] = event.data

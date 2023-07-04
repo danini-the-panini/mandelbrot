@@ -102,6 +102,7 @@ export default class MandelbrotController extends Controller {
       await this.impl.initialize()
       this.afterLoad()
     } catch(e) {
+      console.error(e)
       this.element.classList.add(this.errorClass)
       this.impl.destroy()
       this.impl = null
@@ -117,8 +118,14 @@ export default class MandelbrotController extends Controller {
     if (this.running) return
 
     this.beforeRun()
-    await this.implRun()
-    this.afterRun()
+    try {
+      await this.implRun()
+      this.afterRun()
+    } catch (e) {
+      console.error(e)
+      this.element.classList.add(this.errorClass)
+      this.afterRun(`${e.message} ❗️`)
+    }
   }
 
   autorun() {
@@ -160,13 +167,15 @@ export default class MandelbrotController extends Controller {
 
     this.message = 'Running...'
     this.element.classList.add(this.runningClass)
+    this.element.classList.remove(this.errorClass)
     this.disableInputs()
   }
 
-  afterRun() {
+  afterRun(message: string | null = null) {
     if (this.impl.mode === RunMode.render) return
 
     this.element.classList.remove(this.runningClass)
+    if (message) this.message = message
     this.enableInputs()
   }
 

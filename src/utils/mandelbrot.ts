@@ -15,5 +15,3 @@ export default function mandelbrot(x: number, y: number, width: number, height: 
 
   return iter
 }
-
-export type MandelbrotFn = typeof mandelbrot

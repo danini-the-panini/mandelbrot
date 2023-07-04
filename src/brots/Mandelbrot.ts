@@ -14,12 +14,14 @@ export default abstract class Mandelbrot {
   mode = RunMode.off
   devicePixelRatio: number;
 
+  get imageByteSize() { return (this.width * this.height * 4)|0 }
+
   get height(): number {
-    return this.canvas.height
+    return this.canvas.height|0
   }
 
   get width(): number {
-    return this.canvas.width
+    return this.canvas.width|0
   }
 
   constructor(element: Element) {
@@ -44,15 +46,19 @@ export default abstract class Mandelbrot {
 
   async beforePerform(_iterations: number) : Promise<void> {}
   abstract perform(iterations: number) : Promise<void>
+  async afterPerform(_iterations: number) : Promise<void> {}
 
   async run(iterations: number) {
     this.clearCanvas()
     await this.beforePerform(iterations)
 
     await delay(1)
-    return this.withTiming(() => (
+    const elapsed = this.withTiming(() => (
       this.perform(iterations)
     ))
+    await this.afterPerform(iterations)
+
+    return elapsed
   }
 
   async withTiming(fn: () => Promise<void>): Promise<number | null> {

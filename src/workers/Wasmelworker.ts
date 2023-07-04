@@ -3,33 +3,53 @@ import setRGB from "../utils/setrgb"
 import workerOffset from "../utils/workerOffset"
 
 import assembly from '../wasm/assembly.wasm?init'
-
-type MandelbrotFn = (x: number, y: number, widtH: number, height: number, iterations: number, zoom: number) => number
+import roundUpToPages from "../utils/roundUpToPages"
 
 class Wasmelworker extends BaseWorker {
-  mandelbrot: MandelbrotFn
+  instance: WebAssembly.Instance;
+  memory: WebAssembly.Memory;
+  data: Uint8ClampedArray;
 
-  async initialize(numWorkers: number, workerIndex: number): Promise<void> {
-    super.initialize(numWorkers, workerIndex)
-
-    let instance = await assembly({})
-    this.mandelbrot = instance.exports.mandelbrot as MandelbrotFn
+  get imageByteSize() {
+    let [, rows] = this.workerOffset()
+    return this.width*rows*4
   }
 
-  async perform(width: number, height: number, iterations: number, zoom: number): Promise<ImageData> {
-    let [rows, offset] = workerOffset(height, this.index, this.numWorkers)
+  get runMandelbrot(): Function {
+    return this.instance.exports.runSomeMandelbrot as Function
+  }
 
-    let image = new ImageData(width, rows)
+  async initialize(numWorkers: number, workerIndex: number, width: number, height: number): Promise<void> {
+    await super.initialize(numWorkers, workerIndex, width, height)
+    this.memory = new WebAssembly.Memory({
+      initial: roundUpToPages(this.imageByteSize),
+      maximum: 1024
+    })
+    this.instance = await assembly({
+      env: { memory: this.memory }
+    })
+  }
 
-    for (let r = 0; r < rows; r++) {
-      for (let x = 0; x < width; x++) {
-        let y = r + offset
-        let rgb = this.mandelbrot(x, y, width, height, iterations, zoom)
-        setRGB(image, x, r, rgb)
-      }
-    }
+  async beforePerform(width: number, height: number): Promise<void> {
+    await super.beforePerform(width, height)
+    const arraySize = this.imageByteSize
+    this.updateMemory(arraySize)
+    this.data = new Uint8ClampedArray(this.memory.buffer, 0, arraySize)
+  }
 
-    return image
+  async perform(iterations: number, zoom: number): Promise<ImageData> {
+    let [offset, rows] = this.workerOffset()
+
+    this.runMandelbrot(this.width, this.height, iterations, zoom, offset, rows)
+
+    return new ImageData(this.data, this.width, rows)
+  }
+
+  private updateMemory(arraySize: number) {
+    if (arraySize <= this.memory.buffer.byteLength) return
+
+    const needBytes = arraySize - this.memory.buffer.byteLength
+    this.memory.grow(roundUpToPages(needBytes))
   }
 }
 
