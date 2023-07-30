@@ -1,8 +1,6 @@
-import workerOffset from "../utils/workerOffset"
+/// <reference lib="webworker" />
 
 export default abstract class BaseWorker {
-  numWorkers: number
-  index: number
   width: number
   height: number
 
@@ -10,27 +8,23 @@ export default abstract class BaseWorker {
     onmessage = this.onMessage.bind(this)
   }
 
-  async initialize(numWorkers: number, index: number, width: number, height: number) : Promise<void> {
-    this.numWorkers = numWorkers
-    this.index = index
-    this.width = width
-    this.height = height
-  }
-
   async beforePerform(width: number, height: number): Promise<void> {
     this.width = width
     this.height = height
   }
-  abstract perform(iterations: number, zoom: number) : Promise<ImageData>
+  abstract perform(iterations: number, zoom: number, y: number) : Promise<ImageBitmap>
   async afterPerform(): Promise<void> {}
-
-  protected workerOffset() {
-    return workerOffset(this.height, this.index, this.numWorkers)
-  }
 
   private async onMessage(event: MessageEvent) {
     const [name, ...args] = event.data
-    const result = await this[name](...args)
-    self.postMessage([name, result])
+    if (name === 'perform') {
+      const result = await this.perform(...args as [number, number, number])
+      self.postMessage([name, result], [result])
+    } else if (typeof this[name] === 'function') {
+      await this[name](...args)
+      self.postMessage([name])
+    } else {
+      throw new Error(`No such method '${name}' on ${this.constructor.name}`)
+    }
   }
 }

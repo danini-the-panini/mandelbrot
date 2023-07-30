@@ -6,23 +6,17 @@ export default class WorkerHelper {
   numWorkers: number
   calls: Record<string, Deferred<any>>
 
-  constructor(worker: Worker, numWorkers: number, index: number) {
+  constructor(worker: Worker) {
     this.worker = worker
-    this.index = index
-    this.numWorkers = numWorkers
     this.worker.onmessage = this.onMessage.bind(this)
     this.calls = {}
-  }
-
-  async initialize(width: number, height: number): Promise<void> {
-    return this.postMessage('initialize', this.numWorkers, this.index, width, height)
   }
 
   async beforePerform(width: number, height: number): Promise<void> {
     return this.postMessage('beforePerform', width, height)
   }
 
-  async perform(iterations: number, zoom: number): Promise<ImageData> {
+  async perform(iterations: number, zoom: number, y: number): Promise<ImageBitmap> {
     return this.postMessage('perform', iterations, zoom)
   }
 

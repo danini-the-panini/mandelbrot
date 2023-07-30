@@ -5,6 +5,7 @@ import workerOffset from "../utils/workerOffset";
 import Mandelworker from '../workers/Mandelworker?worker&inline'
 import { ZOOM } from "../utils/constants";
 import { RunMode } from "./Mandelbrot";
+import Deferred from "../utils/deferred";
 
 export default class Workelbrot extends Vanillalbrot {
   workers: Array<WorkerHelper> = []
@@ -18,12 +19,8 @@ export default class Workelbrot extends Vanillalbrot {
     this.workers = new Array(Math.floor(cpus * 2))
 
     for (let i = 0; i < this.workers.length; i++) {
-      this.workers[i] = new WorkerHelper(this.createWorker(), this.workers.length, i)
+      this.workers[i] = new WorkerHelper(this.createWorker())
     }
-
-    await Promise.all(this.workers.map(async w => {
-      await w.initialize(this.width, this.height)
-    }))
   }
 
   async isSupported(): Promise<boolean> {
@@ -37,11 +34,27 @@ export default class Workelbrot extends Vanillalbrot {
   }
 
   async perform(iterations: number): Promise<void> {
-    await Promise.all(this.workers.map(async w => {
-      const image = await w.perform(iterations, ZOOM)
-      let [offset,] = workerOffset(this.height, w.index, this.workers.length)
-      this.context.putImageData(image, 0, offset)
-    }))
+    let y = 0
+    let done = 0
+    const deferred = new Deferred<void>()
+    const runOnWorker = (w: WorkerHelper) => {
+      if (done >= this.height-1) deferred.resolve()
+      if (y < this.height) {
+        const thisY = y
+        y++
+        w.perform(iterations, ZOOM, thisY).then(image => {
+          this.context.drawImage(image, 0, thisY)
+          done++
+          if (done >= this.height-1) {
+            deferred.resolve()
+          } else {
+            runOnWorker(w)
+          }
+        })
+      }
+    }
+    this.workers.forEach(runOnWorker)
+    return deferred.promise
   }
 
   async afterPerform(_iterations: number): Promise<void> {
