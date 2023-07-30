@@ -1,6 +1,5 @@
 import WorkerHelper from "../utils/WorkerHelper";
 import Vanillalbrot from "./Vanillalbrot";
-import workerOffset from "../utils/workerOffset";
 
 import Mandelworker from '../workers/Mandelworker?worker&inline'
 import { ZOOM } from "../utils/constants";
@@ -9,6 +8,7 @@ import Deferred from "../utils/deferred";
 
 export default class Workelbrot extends Vanillalbrot {
   workers: Array<WorkerHelper> = []
+  buffer: SharedArrayBuffer;
 
   mode = RunMode.autorun
 
@@ -16,7 +16,7 @@ export default class Workelbrot extends Vanillalbrot {
     await super.initialize()
 
     let cpus = navigator.hardwareConcurrency || 8
-    this.workers = new Array(Math.floor(cpus * 2))
+    this.workers = new Array(Math.floor(cpus))
 
     for (let i = 0; i < this.workers.length; i++) {
       this.workers[i] = new WorkerHelper(this.createWorker())
@@ -28,8 +28,10 @@ export default class Workelbrot extends Vanillalbrot {
   }
 
   async beforePerform(_iterations: number): Promise<void> {
+    this.buffer = new SharedArrayBuffer(this.width*this.height*4)
+
     await Promise.all(this.workers.map(async w => {
-      await w.beforePerform(this.width, this.height)
+      await w.beforePerform(this.width, this.height, this.buffer)
     }))
   }
 
@@ -37,30 +39,38 @@ export default class Workelbrot extends Vanillalbrot {
     let y = 0
     let done = 0
     const deferred = new Deferred<void>()
-    const runOnWorker = (w: WorkerHelper) => {
-      if (done >= this.height-1) deferred.resolve()
+    const runOnWorker = (w: WorkerHelper, i: number) => {
       if (y < this.height) {
         const thisY = y
         y++
-        w.perform(iterations, ZOOM, thisY).then(image => {
-          this.context.drawImage(image, 0, thisY)
+        w.perform(iterations, ZOOM, thisY).then(() => {
           done++
-          if (done >= this.height-1) {
-            deferred.resolve()
+          if (done < this.height) {
+            runOnWorker(w, i)
           } else {
-            runOnWorker(w)
+            deferred.resolve()
           }
         })
       }
     }
     this.workers.forEach(runOnWorker)
-    return deferred.promise
+    await deferred.promise
   }
 
   async afterPerform(_iterations: number): Promise<void> {
     await Promise.all(this.workers.map(async w => {
       await w.afterPerform()
     }))
+
+    this.context.putImageData(
+      new ImageData(
+        new Uint8ClampedArray(this.buffer, 0, this.buffer.byteLength).slice(),
+        this.width,
+        this.height
+      ),
+      0,
+      0
+    )
   }
 
   createWorker(): Worker {

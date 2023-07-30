@@ -1,4 +1,4 @@
-export default function setRGB(image: ImageData, x: number, y: number, iter: number) {
+export default function setRGB(image: { data: Uint8ClampedArray, width: number }, x: number, y: number, iter: number) {
   let idx = (x + y * image.width) * 4
   let abc = iter | (iter << 8)
 

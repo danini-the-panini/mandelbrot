@@ -53,9 +53,7 @@ export default abstract class Mandelbrot {
     await this.beforePerform(iterations)
 
     await delay(1)
-    const elapsed = this.withTiming(() => (
-      this.perform(iterations)
-    ))
+    const elapsed = await this.withTiming(() => this.perform(iterations))
     await this.afterPerform(iterations)
 
     return elapsed

@@ -5,21 +5,12 @@ import setRGB from "../utils/setrgb"
 class Mandelworker extends BaseWorker {
   image: ImageData
 
-  async beforePerform(width: number, height: number): Promise<void> {
-    await super.beforePerform(width, height)
-    this.image = new ImageData(this.width, 1)
-  }
-
-  async perform(iterations: number, zoom: number, y: number): Promise<ImageBitmap> {
+  async perform(iterations: number, zoom: number, y: number): Promise<void> {
+    const data = new Uint8ClampedArray(this.buffer, y*this.width*4, this.width*4)
     for (let x = 0; x < this.width; x++) {
       let rgb = mandelbrot(x, y, this.width, this.height, iterations, zoom)
-      setRGB(this.image, x, 0, rgb)
+      setRGB({ data, width: this.width }, x, 0, rgb)
     }
-    const canvas = new OffscreenCanvas(this.width, 1)
-    const ctx = canvas.getContext('2d')
-    ctx.putImageData(this.image, 0, 0)
-
-    return canvas.transferToImageBitmap()
   }
 }
 

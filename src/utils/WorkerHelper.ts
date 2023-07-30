@@ -2,8 +2,6 @@ import Deferred from "./deferred"
 
 export default class WorkerHelper {
   worker: Worker
-  index: number
-  numWorkers: number
   calls: Record<string, Deferred<any>>
 
   constructor(worker: Worker) {
@@ -12,12 +10,12 @@ export default class WorkerHelper {
     this.calls = {}
   }
 
-  async beforePerform(width: number, height: number): Promise<void> {
-    return this.postMessage('beforePerform', width, height)
+  async beforePerform(width: number, height: number, buffer: SharedArrayBuffer): Promise<void> {
+    return this.postMessage('beforePerform', width, height, buffer)
   }
 
-  async perform(iterations: number, zoom: number, y: number): Promise<ImageBitmap> {
-    return this.postMessage('perform', iterations, zoom)
+  async perform(iterations: number, zoom: number, y: number): Promise<void> {
+    return this.postMessage('perform', iterations, zoom, y)
   }
 
   async afterPerform(): Promise<void> {
