@@ -28,7 +28,7 @@ export default class Workelbrot extends Vanillalbrot {
   }
 
   async beforePerform(_iterations: number): Promise<void> {
-    this.buffer = new SharedArrayBuffer(this.width*this.height*4)
+    this.buffer = new SharedArrayBuffer(this.imageByteSize)
 
     await Promise.all(this.workers.map(async w => {
       await w.beforePerform(this.width, this.height, this.buffer)
@@ -64,7 +64,7 @@ export default class Workelbrot extends Vanillalbrot {
 
     this.context.putImageData(
       new ImageData(
-        new Uint8ClampedArray(this.buffer, 0, this.buffer.byteLength).slice(),
+        new Uint8ClampedArray(this.buffer, 0, this.imageByteSize).slice(),
         this.width,
         this.height
       ),

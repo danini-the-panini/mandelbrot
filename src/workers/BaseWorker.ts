@@ -1,16 +1,14 @@
-/// <reference lib="webworker" />
-
-export default abstract class BaseWorker {
+export default abstract class BaseWorker<M> {
   width: number
   height: number
-  buffer: SharedArrayBuffer
+  buffer: M
 
   start() {
     onmessage = this.onMessage.bind(this)
   }
 
   async initialize(): Promise<void> {}
-  async beforePerform(width: number, height: number, buffer: SharedArrayBuffer): Promise<void> {
+  async beforePerform(width: number, height: number, buffer: M): Promise<void> {
     this.width = width
     this.height = height
     this.buffer = buffer

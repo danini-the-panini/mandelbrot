@@ -6,7 +6,10 @@
     "outFile": "src/wasm/assembly.wasm",
     "textFile": "src/wasm/assembly.wat",
     "sourceMap": true,
-    "importMemory": true
+    "importMemory": true,
+    "sharedMemory": true,
+    "maximumMemory": 1024,
+    "enable": ["threads"]
   },
   "targets": {
     "debug": {

@@ -2,7 +2,7 @@ import BaseWorker from "./BaseWorker"
 import mandelbrot from "../utils/mandelbrot"
 import setRGB from "../utils/setrgb"
 
-class Mandelworker extends BaseWorker {
+class Mandelworker extends BaseWorker<SharedArrayBuffer> {
   image: ImageData
 
   async perform(iterations: number, zoom: number, y: number): Promise<void> {

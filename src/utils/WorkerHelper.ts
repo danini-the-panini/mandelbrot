@@ -10,7 +10,7 @@ export default class WorkerHelper {
     this.calls = {}
   }
 
-  async beforePerform(width: number, height: number, buffer: SharedArrayBuffer): Promise<void> {
+  async beforePerform(width: number, height: number, buffer: SharedArrayBuffer | WebAssembly.Memory): Promise<void> {
     return this.postMessage('beforePerform', width, height, buffer)
   }
 

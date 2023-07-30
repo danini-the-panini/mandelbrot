@@ -22,7 +22,8 @@ export default class Wasmelbrot extends Vanillalbrot {
     await super.initialize()
     this.memory = new WebAssembly.Memory({
       initial: roundUpToPages(this.imageByteSize),
-      maximum: 1024
+      maximum: 1024,
+      shared: true
     })
     this.instance = await assembly({
       env: { memory: this.memory }
@@ -40,7 +41,7 @@ export default class Wasmelbrot extends Vanillalbrot {
   }
 
   async afterPerform(_iterations: number): Promise<void> {
-    this.context.putImageData(new ImageData(this.data, this.width, this.height), 0, 0)
+    this.context.putImageData(new ImageData(this.data.slice(), this.width, this.height), 0, 0)
   }
 
   private updateMemory(arraySize: number) {

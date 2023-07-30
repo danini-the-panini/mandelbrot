@@ -31,18 +31,17 @@ function mandelbrot(x: f32, y: f32, width: f32, height: f32, iterations: u32, zo
   return iter
 }
 
-export function runSomeMandelbrot(width: u32, height: u32, iterations: u32, zoom: f32, offset: u32, rows: u32): void {
+export function mandelbrotRow(width: u32, height: u32, iterations: u32, zoom: f32, y: u32): void {
   let fwidth: f32 = <f32>width
   let fheight: f32 = <f32>height
-  for (let r: u32 = 0; r < rows; r++) {
-    for (let x: u32 = 0; x < width; x++) {
-      let y = r + offset
-      let iter = mandelbrot(<f32>x, <f32>y, fwidth, fheight, iterations, zoom)
-      setRGB(width, x, r, iter)
-    }
+  for (let x: u32 = 0; x < width; x++) {
+    let iter = mandelbrot(<f32>x, <f32>y, fwidth, fheight, iterations, zoom)
+    setRGB(width, x, y, iter)
   }
 }
 
 export default function runMandelbrot(width: u32, height: u32, iterations: u32, zoom: f32): void {
-  runSomeMandelbrot(width, height, iterations, zoom, 0, height)
+  for (let y: u32 = 0; y < height; y++) {
+    mandelbrotRow(width, height, iterations, zoom, y)
+  }
 }
