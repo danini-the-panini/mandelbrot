@@ -1,47 +1,77 @@
-// TODO: make portable?
-function setRGB(width: u32, x: u32, y: u32, iter: u32): void {
-  let idx = (x + y * width) * 4
-  let abc = iter | (iter << 8)
+const vThreshold = v128.splat<f32>(4.0)
+const vOne = v128.splat<i32>(1)
 
-  let a: u8 = <u8>((abc >> 16) & 0xFF)
-  let b: u8 = <u8>((abc >> 8) & 0xFF)
-  let c: u8 = <u8>(abc & 0xFF)
+function mandelSimdRow(width: i32, height: i32, iterations: i32, zoom: f32, y: i32): void {
+  let vHalfWidth = v128.splat<f32>(<f32>width / 2.0)
+  let vHalfHeight = v128.splat<f32>(<f32>height / 2.0)
+  let vZoom = v128.splat<f32>(zoom)
 
-  store<u8>(idx + 0, a)   // red
-  store<u8>(idx + 1, c)   // green
-  store<u8>(idx + 2, b)   // blue
-  store<u8>(idx + 3, 255) // alpha
-}
+  for (let x: i32 = 0; x < width; x+=4) {
+    let mx = f32x4(<f32>x + 3.0, <f32>x + 2.0, <f32>x + 1.0, <f32>x + 0.0)
+    let my = v128.splat<f32>(<f32>y)
 
-function mandelbrot(x: f32, y: f32, width: f32, height: f32, iterations: u32, zoom: f32): u32 {
-  let zx: f32 = 0.0
-  let zy: f32 = 0.0
-  let cX: f32 = (x - width / 2.0) / zoom
-  let cY: f32 = (y - height / 2.0) / zoom
+    let zx = v128.splat<f32>(0.0)
+    let zy = v128.splat<f32>(0.0)
+    let cx = v128.div<f32>(v128.sub<f32>(mx, vHalfWidth), vZoom)
+    let cy = v128.div<f32>(v128.sub<f32>(my, vHalfHeight), vZoom)
 
-  let iter = iterations
+    let iter = iterations
+    let vIter = v128.splat<i32>(iter)
 
-  while (zx * zx + zy * zy < 4.0 && iter > 0) {
-    let tmp = zx * zx - zy * zy + cX
-    zy = 2.0 * zx * zy + cY
-    zx = tmp
-    iter--
+    let zx2 = v128.mul<f32>(zx, zx)
+    let zy2 = v128.mul<f32>(zy, zy)
+    while (iter > 0) {
+      // tmp = zx * zx - zy * zy + cx
+      let tmp = v128.add<f32>(v128.sub<f32>(zx2, zy2), cx)
+      let zy1 = v128.mul<f32>(zx, zy)
+      zy = v128.add<f32>(v128.add<f32>(zy1, zy1), cy)
+      zx = tmp
+
+      // zx * zx + zy * zy < 4.0
+      zx2 = v128.mul<f32>(zx, zx)
+      zy2 = v128.mul<f32>(zy, zy)
+      let mask = v128.lt<f32>(v128.add<f32>(zx2, zy2), vThreshold)
+      vIter = v128.sub<i32>(vIter, v128.and(mask, vOne))
+
+      if (v128.bitmask<i32>(mask) == 0) break
+
+      iter--
+    }
+
+    let vABC = v128.or(
+      v128.or(vIter, v128.shl<i32>(vIter, 8)),
+      v128(0, 0, 0, <u8>255, 0, 0, 0, <u8>255, 0, 0, 0, <u8>255, 0, 0, 0, <u8>255)
+    )
+
+    v128.store(
+      (y * width + x) * 4,
+      v128.swizzle(vABC, v128(
+        12 + 2, 12 + 0, 12 + 1, 12 + 3,
+         8 + 2,  8 + 0,  8 + 1,  8 + 3,
+         4 + 2,  4 + 0,  4 + 1,  4 + 3,
+         0 + 2,  0 + 0,  0 + 1,  0 + 3,
+      ))
+    )
   }
-
-  return iter
 }
 
-export function mandelbrotRow(width: u32, height: u32, iterations: u32, zoom: f32, y: u32): void {
-  let fwidth: f32 = <f32>width
-  let fheight: f32 = <f32>height
-  for (let x: u32 = 0; x < width; x++) {
-    let iter = mandelbrot(<f32>x, <f32>y, fwidth, fheight, iterations, zoom)
-    setRGB(width, x, y, iter)
-  }
+export function runMandelbrotRow(
+  width: i32,
+  height: i32,
+  iterations: i32,
+  zoom :f32,
+  y: i32
+): void {
+  mandelSimdRow(width, height, iterations, zoom, y)
 }
 
-export default function runMandelbrot(width: u32, height: u32, iterations: u32, zoom: f32): void {
-  for (let y: u32 = 0; y < height; y++) {
-    mandelbrotRow(width, height, iterations, zoom, y)
+export default function runMandelbrot(
+  width: i32,
+  height: i32,
+  iterations: i32,
+  zoom: f32
+): void {
+  for (let y: i32 = 0; y < height; y++) {
+    mandelSimdRow(width, height, iterations, zoom, y)
   }
 }

@@ -4,6 +4,7 @@ import assembly from '../wasm/assembly.wasm?init'
 import wasmSupported from "../utils/wasmSupported"
 import { ZOOM } from "../utils/constants";
 import roundUpToPages from "../utils/roundUpToPages";
+import wasmAbort from "../utils/wasmAbort";
 
 export default class Wasmelbrot extends Vanillalbrot {
   instance: WebAssembly.Instance;
@@ -26,7 +27,7 @@ export default class Wasmelbrot extends Vanillalbrot {
       shared: true
     })
     this.instance = await assembly({
-      env: { memory: this.memory }
+      env: { memory: this.memory, abort: wasmAbort }
     })
   }
 
