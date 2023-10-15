@@ -8,6 +8,8 @@ export enum RunMode {
 
 export declare type MandelbrotConstructor = new (element: Element) => Mandelbrot
 
+export declare type Point = { x: number, y: number }
+
 export default abstract class Mandelbrot {
   canvas: HTMLCanvasElement
 
@@ -26,6 +28,11 @@ export default abstract class Mandelbrot {
 
   constructor(element: Element) {
     this.canvas = document.createElement('canvas')
+    this.canvas.dataset.action = [
+      'wheel->mandelbrot#wheelZoom:!passive:prevent',
+      'mousemove->mandelbrot#mousePan',
+      // TODO: add touch support
+    ].join(' ')
     element.append(this.canvas)
     this.layout()
   }
@@ -38,6 +45,7 @@ export default abstract class Mandelbrot {
 
   async isSupported(): Promise<boolean> { return true }
   async initialize(): Promise<void> {}
+
   async destroy(): Promise<void> {
     this.canvas.remove()
   }
@@ -45,15 +53,15 @@ export default abstract class Mandelbrot {
   clearCanvas() {}
 
   async beforePerform(_iterations: number) : Promise<void> {}
-  abstract perform(iterations: number) : Promise<void>
+  abstract perform(iterations: number, center: Point, rectangle: Point) : Promise<void>
   async afterPerform(_iterations: number) : Promise<void> {}
 
-  async run(iterations: number) {
+  async run(iterations: number, center: Point, rectangle: Point) {
     this.clearCanvas()
     await this.beforePerform(iterations)
 
     await delay(1)
-    const elapsed = await this.withTiming(() => this.perform(iterations))
+    const elapsed = await this.withTiming(() => this.perform(iterations, center, rectangle))
     await this.afterPerform(iterations)
 
     return elapsed

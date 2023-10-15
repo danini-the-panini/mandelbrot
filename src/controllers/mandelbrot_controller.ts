@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus";
 import Vanillalbrot from "../brots/Vanillalbrot";
 import Wasmelbrot from "../brots/Wasmelbrot";
-import Mandelbrot, { MandelbrotConstructor, RunMode } from "../brots/Mandelbrot";
+import Mandelbrot, { MandelbrotConstructor, RunMode, Point } from "../brots/Mandelbrot";
 import debounce from "../utils/debounce";
 import formatSeconds from "../utils/formatSeconds";
 import Workelbrot from "../brots/Workelbrot";
@@ -17,6 +17,8 @@ const BROTS = {
   'WebGL':        Webgelbrot,
   'WebGPU':       Webgpulbrot
 }
+
+const ZOOM_STEP = 2;
 
 export default class MandelbrotController extends Controller {
   static targets = [
@@ -45,8 +47,11 @@ export default class MandelbrotController extends Controller {
   declare readonly iterationsDisplayTarget: HTMLElement;
   declare readonly implTarget: HTMLSelectElement;
 
-  impl: Mandelbrot | null = null
+  impl: Mandelbrot | null = null;
   debounceRun: () => void;
+
+  center: Point = { x: 0, y: 0 };
+  zoom = 0;
 
   get iterations(): number {
     const n = parseInt(this.iterationsTarget.value, 10)
@@ -64,6 +69,20 @@ export default class MandelbrotController extends Controller {
 
   get running(): boolean {
     return this.element.classList.contains(this.runningClass)
+  }
+
+  get width(): number {
+    return this.impl.width;
+  }
+
+  get height(): number {
+    return this.impl.height;
+  }
+
+  get rectangle(): Point {
+    let y = ZOOM_STEP ** -this.zoom;
+    let aspect = this.width / this.height;
+    return { x: y * aspect, y }
   }
 
   initialize() {
@@ -155,10 +174,41 @@ export default class MandelbrotController extends Controller {
     if (this.impl.mode === RunMode.render) this.render()
   }
 
+  wheelZoom({ offsetX, offsetY, deltaY }) {
+    const pointX = ((offsetX / this.width * 2 - 1) / (
+      (ZOOM_STEP ** this.zoom) / (this.width / this.height)
+    )) + this.center.x;
+
+    const pointY = (-(offsetY / this.height * 2 - 1) / (
+      (ZOOM_STEP ** this.zoom)
+    )) + this.center.y;
+
+    const delta = Math.min(Math.max(-deltaY * 5, -100), 100) / 100;
+
+    this.zoom += delta;
+
+    this.center.x = pointX - (pointX - this.center.x) / (ZOOM_STEP ** delta);
+    this.center.y = pointY - (pointY - this.center.y) / (ZOOM_STEP ** delta);
+
+    this.impl?.clearCanvas()
+  }
+
+  mousePan({ buttons, movementX, movementY }) {
+    if (!(buttons & 1)) return
+
+    this.center.x += -(movementX / this.width * 2) /
+      ((ZOOM_STEP ** this.zoom) / (this.width / this.height));
+
+    this.center.y += (movementY / this.height * 2) /
+      (ZOOM_STEP ** this.zoom);
+
+    this.impl?.clearCanvas()
+  }
+
   // methods
 
   async implRun() {
-    const elapsed = await this.impl.run(this.iterations)
+    const elapsed = await this.impl.run(this.iterations, this.center, this.rectangle)
     this.message = formatSeconds(elapsed)
   }
 
