@@ -18,7 +18,7 @@ const BROTS = {
   'WebGPU':       Webgpulbrot
 }
 
-const ZOOM_STEP = 2;
+const ZOOM_BASE = 2;
 
 export default class MandelbrotController extends Controller {
   static targets = [
@@ -51,7 +51,7 @@ export default class MandelbrotController extends Controller {
   debounceRun: () => void;
 
   center: Point = { x: 0, y: 0 };
-  zoom = 0;
+  zoomLevel = 0;
 
   get iterations(): number {
     const n = parseInt(this.iterationsTarget.value, 10)
@@ -80,9 +80,9 @@ export default class MandelbrotController extends Controller {
   }
 
   get rectangle(): Point {
-    let y = ZOOM_STEP ** -this.zoom;
+    let scale = ZOOM_BASE ** -this.zoomLevel;
     let aspect = this.width / this.height;
-    return { x: y * aspect, y }
+    return { x: scale * aspect, y: scale }
   }
 
   initialize() {
@@ -102,6 +102,7 @@ export default class MandelbrotController extends Controller {
     })
 
     this.switchImpl()
+    this.layoutBackground()
   }
 
   // actions
@@ -175,34 +176,34 @@ export default class MandelbrotController extends Controller {
   }
 
   wheelZoom({ offsetX, offsetY, deltaY }) {
-    const pointX = ((offsetX / this.width * 2 - 1) / (
-      (ZOOM_STEP ** this.zoom) / (this.width / this.height)
-    )) + this.center.x;
+    const zoom = ZOOM_BASE ** this.zoomLevel
+    const aspect = this.width / this.height
 
-    const pointY = (-(offsetY / this.height * 2 - 1) / (
-      (ZOOM_STEP ** this.zoom)
-    )) + this.center.y;
+    const pointX = ((offsetX / this.width * 2 - 1) / zoom * aspect) + this.center.x;
+    const pointY = (-(offsetY / this.height * 2 - 1) / zoom) + this.center.y;
 
     const delta = Math.min(Math.max(-deltaY * 5, -100), 100) / 100;
+    const zoomDelta = ZOOM_BASE ** delta
 
-    this.zoom += delta;
+    this.zoomLevel += delta;
 
-    this.center.x = pointX - (pointX - this.center.x) / (ZOOM_STEP ** delta);
-    this.center.y = pointY - (pointY - this.center.y) / (ZOOM_STEP ** delta);
+    this.center.x = pointX - (pointX - this.center.x) / zoomDelta;
+    this.center.y = pointY - (pointY - this.center.y) / zoomDelta;
 
     this.impl?.clearCanvas()
+    this.layoutBackground()
   }
 
   mousePan({ buttons, movementX, movementY }) {
     if (!(buttons & 1)) return
 
-    this.center.x += -(movementX / this.width * 2) /
-      ((ZOOM_STEP ** this.zoom) / (this.width / this.height));
+    const scale = this.height * (ZOOM_BASE ** this.zoomLevel)
 
-    this.center.y += (movementY / this.height * 2) /
-      (ZOOM_STEP ** this.zoom);
+    this.center.x += -2 * movementX / scale
+    this.center.y += 2 * movementY / scale
 
     this.impl?.clearCanvas()
+    this.layoutBackground()
   }
 
   // methods
@@ -253,9 +254,20 @@ export default class MandelbrotController extends Controller {
   }
 
   layoutBackground() {
-    const devicePixelRatio = window.devicePixelRatio || 1
-    const width = 800 / devicePixelRatio
-    const height = 600 / devicePixelRatio
-    this.outputTarget.style.backgroundSize = `${width}px ${height}px`
+    if (!this.impl) return
+
+    const scale = this.height * (ZOOM_BASE ** this.zoomLevel)
+
+    const height = scale * 2
+    const width  = height
+
+    const offsetX = -0.5 * this.center.x * scale
+    const offsetY = 0.5 * this.center.y * scale
+
+    const x = offsetX - width / 2 + this.width / 2
+    const y = offsetY - height / 2 + this.height / 2
+
+    this.outputTarget.style.backgroundSize     = `${width}px ${height}px`
+    this.outputTarget.style.backgroundPosition = `${x}px ${y}px`
   }
 }

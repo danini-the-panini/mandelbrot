@@ -70,7 +70,6 @@ body.-running button::before {
 
 main {
   background-image: url('/mandelbg.svg');
-  background-size: 50rem 37.5rem;
   background-position: center;
   background-repeat: no-repeat;
   flex-grow: 1;
@@ -79,6 +78,7 @@ main {
 }
 
 canvas {
+  opacity: 0.5;
   flex-grow: 1;
   width: 0;
   height: 0;
