@@ -3,12 +3,12 @@ export default function mandelbrot(
   y:          number,
   centerX:    number,
   centerY:    number,
-  width:      number,
-  height:     number,
+  rectX:      number,
+  rectY:      number,
   iterations: number
 ): number {
-  let cX = centerX + x * width
-  let cY = centerY + y * height
+  let cX = centerX + x * rectX
+  let cY = centerY + y * rectY
   let zx = cX
   let zy = cY
 

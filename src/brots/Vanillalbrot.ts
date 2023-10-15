@@ -24,7 +24,7 @@ export default class Vanillalbrot extends Mandelbrot {
         let fX = (x / this.width) * 2 - 1
         let fY = (y / this.height) * 2 - 1
 
-        let iter = mandelbrot(fX, fY, center.x, center.y, rectangle.x, rectangle.y, iterations)
+        let iter = mandelbrot(fX, fY, center.x, -center.y, rectangle.x, rectangle.y, iterations)
         setRGB(this.image, x, y, iter)
       }
     }
