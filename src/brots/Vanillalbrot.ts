@@ -20,11 +20,12 @@ export default class Vanillalbrot extends Mandelbrot {
 
   async perform(iterations: number, center: Point, rectangle: Point): Promise<void> {
     for (let y = 0; y < this.height; y++) {
+      let fY = (y / this.height) * 2 - 1
+
       for (let x = 0; x < this.width; x++) {
         let fX = (x / this.width) * 2 - 1
-        let fY = (y / this.height) * 2 - 1
 
-        let iter = mandelbrot(fX, fY, center.x, -center.y, rectangle.x, rectangle.y, iterations)
+        let iter = mandelbrot(fX, fY, center, rectangle, iterations)
         setRGB(this.image, x, y, iter)
       }
     }

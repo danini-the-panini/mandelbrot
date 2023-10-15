@@ -180,7 +180,7 @@ export default class MandelbrotController extends Controller {
     const aspect = this.width / this.height
 
     const pointX = ((offsetX / this.width * 2 - 1) / zoom * aspect) + this.center.x;
-    const pointY = (-(offsetY / this.height * 2 - 1) / zoom) + this.center.y;
+    const pointY = ((offsetY / this.height * 2 - 1) / zoom) + this.center.y;
 
     const delta = Math.min(Math.max(-deltaY * 5, -100), 100) / 100;
     const zoomDelta = ZOOM_BASE ** delta
@@ -192,6 +192,8 @@ export default class MandelbrotController extends Controller {
 
     this.impl?.clearCanvas()
     this.layoutBackground()
+    if (this.impl.mode === RunMode.autorun) this.debounceRun()
+    if (this.impl.mode === RunMode.render) this.render()
   }
 
   mousePan({ buttons, movementX, movementY }) {
@@ -200,10 +202,12 @@ export default class MandelbrotController extends Controller {
     const scale = this.height * (ZOOM_BASE ** this.zoomLevel)
 
     this.center.x += -2 * movementX / scale
-    this.center.y += 2 * movementY / scale
+    this.center.y += -2 * movementY / scale
 
     this.impl?.clearCanvas()
     this.layoutBackground()
+    if (this.impl.mode === RunMode.autorun) this.debounceRun()
+    if (this.impl.mode === RunMode.render) this.render()
   }
 
   // methods
@@ -262,7 +266,7 @@ export default class MandelbrotController extends Controller {
     const width  = height
 
     const offsetX = -0.5 * this.center.x * scale
-    const offsetY = 0.5 * this.center.y * scale
+    const offsetY = -0.5 * this.center.y * scale
 
     const x = offsetX - width / 2 + this.width / 2
     const y = offsetY - height / 2 + this.height / 2

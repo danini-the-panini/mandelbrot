@@ -1,3 +1,5 @@
+import { Point } from "../brots/Mandelbrot"
+
 export default abstract class BaseWorker<M> {
   width: number
   height: number
@@ -13,7 +15,7 @@ export default abstract class BaseWorker<M> {
     this.height = height
     this.buffer = buffer
   }
-  abstract perform(iterations: number, zoom: number, y: number) : Promise<void>
+  abstract perform(y: number, center: Point, rectangle: Point, iterations: number) : Promise<void>
   async afterPerform(): Promise<void> {}
 
   private async onMessage(event: MessageEvent) {

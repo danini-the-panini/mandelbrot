@@ -3,7 +3,7 @@ import Vanillalbrot from "./Vanillalbrot";
 
 import Mandelworker from '../workers/Mandelworker?worker&inline'
 import { ZOOM } from "../utils/constants";
-import { RunMode } from "./Mandelbrot";
+import { Point, RunMode } from "./Mandelbrot";
 import Deferred from "../utils/deferred";
 
 export default class Workelbrot extends Vanillalbrot {
@@ -35,7 +35,7 @@ export default class Workelbrot extends Vanillalbrot {
     }))
   }
 
-  async perform(iterations: number): Promise<void> {
+  async perform(iterations: number, center: Point, rectangle: Point): Promise<void> {
     let y = 0
     let done = 0
     const deferred = new Deferred<void>()
@@ -43,7 +43,7 @@ export default class Workelbrot extends Vanillalbrot {
       if (y < this.height) {
         const thisY = y
         y++
-        w.perform(iterations, ZOOM, thisY).then(() => {
+        w.perform(thisY, center, rectangle, iterations).then(() => {
           done++
           if (done < this.height) {
             runOnWorker(w, i)

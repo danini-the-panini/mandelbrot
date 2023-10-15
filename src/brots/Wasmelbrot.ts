@@ -2,9 +2,9 @@ import Vanillalbrot from "./Vanillalbrot";
 
 import assembly from '../wasm/assembly.wasm?init'
 import wasmSupported from "../utils/wasmSupported"
-import { ZOOM } from "../utils/constants";
 import roundUpToPages from "../utils/roundUpToPages";
 import wasmAbort from "../utils/wasmAbort";
+import { Point } from "./Mandelbrot";
 
 export default class Wasmelbrot extends Vanillalbrot {
   instance: WebAssembly.Instance;
@@ -37,8 +37,8 @@ export default class Wasmelbrot extends Vanillalbrot {
     this.data = new Uint8ClampedArray(this.memory.buffer, 0, arraySize)
   }
 
-  async perform(iterations: number): Promise<void> {
-    this.runMandelbrot(this.width, this.height, iterations, ZOOM)
+  async perform(iterations: number, center: Point, rectangle: Point): Promise<void> {
+    this.runMandelbrot(this.width, this.height, center.x, center.y, rectangle.x, rectangle.y, iterations)
   }
 
   async afterPerform(_iterations: number): Promise<void> {
