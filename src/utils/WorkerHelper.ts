@@ -1,3 +1,4 @@
+import { Point } from "../brots/Mandelbrot"
 import Deferred from "./deferred"
 
 export default class WorkerHelper {
@@ -14,8 +15,8 @@ export default class WorkerHelper {
     return this.postMessage('beforePerform', width, height, buffer)
   }
 
-  async perform(iterations: number, zoom: number, y: number): Promise<void> {
-    return this.postMessage('perform', iterations, zoom, y)
+  async perform(y: number, center: Point, rectangle: Point, iterations: number): Promise<void> {
+    return this.postMessage('perform', y, center, rectangle, iterations)
   }
 
   async afterPerform(): Promise<void> {

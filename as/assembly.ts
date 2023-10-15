@@ -1,19 +1,36 @@
 const vThreshold = v128.splat<f32>(4.0)
 const vOne = v128.splat<i32>(1)
+const vTwo = v128.splat<i32>(2)
+const vfOne = v128.splat<f32>(1)
 
-function mandelSimdRow(width: i32, height: i32, iterations: i32, zoom: f32, y: i32): void {
-  let vHalfWidth = v128.splat<f32>(<f32>width / 2.0)
-  let vHalfHeight = v128.splat<f32>(<f32>height / 2.0)
-  let vZoom = v128.splat<f32>(zoom)
+function mandelSimdRow(
+  y:          i32,
+  width:      i32,
+  height:     i32,
+  centerX:    f32,
+  centerY:    f32,
+  rectX:      f32,
+  rectY:      f32,
+  iterations: i32
+): void {
+  let fY = (<f32>y / <f32>height) * 2.0 - 1.0
+
+  let vWidth = v128.splat<f32>(<f32>width)
+  let vCenterX = v128.splat<f32>(<f32>centerX)
+  let vCenterY = v128.splat<f32>(<f32>centerY)
+  let vRectX = v128.splat<f32>(<f32>rectX)
+  let vRectY = v128.splat<f32>(<f32>rectY)
 
   for (let x: i32 = 0; x < width; x+=4) {
     let mx = f32x4(<f32>x + 3.0, <f32>x + 2.0, <f32>x + 1.0, <f32>x + 0.0)
-    let my = v128.splat<f32>(<f32>y)
+    mx = v128.div<f32>(mx, vWidth)
+    mx = v128.sub<f32>(v128.add<f32>(mx, mx), vfOne)
+    let my = v128.splat<f32>(fY)
 
-    let zx = v128.splat<f32>(0.0)
-    let zy = v128.splat<f32>(0.0)
-    let cx = v128.div<f32>(v128.sub<f32>(mx, vHalfWidth), vZoom)
-    let cy = v128.div<f32>(v128.sub<f32>(my, vHalfHeight), vZoom)
+    let cx = v128.add<f32>(vCenterX, v128.mul<f32>(mx, vRectX))
+    let cy = v128.add<f32>(vCenterY, v128.mul<f32>(my, vRectY))
+    let zx = cx
+    let zy = cy
 
     let iter = iterations
     let vIter = v128.splat<i32>(iter)
@@ -56,22 +73,28 @@ function mandelSimdRow(width: i32, height: i32, iterations: i32, zoom: f32, y: i
 }
 
 export function runMandelbrotRow(
-  width: i32,
-  height: i32,
-  iterations: i32,
-  zoom :f32,
-  y: i32
+  y:          i32,
+  width:      i32,
+  height:     i32,
+  centerX:    f32,
+  centerY:    f32,
+  rectX:      f32,
+  rectY:      f32,
+  iterations: i32
 ): void {
-  mandelSimdRow(width, height, iterations, zoom, y)
+  mandelSimdRow(y, width, height, centerX, centerY, rectX, rectY, iterations)
 }
 
 export default function runMandelbrot(
-  width: i32,
-  height: i32,
-  iterations: i32,
-  zoom: f32
+  width:      i32,
+  height:     i32,
+  centerX:    f32,
+  centerY:    f32,
+  rectX:      f32,
+  rectY:      f32,
+  iterations: i32
 ): void {
   for (let y: i32 = 0; y < height; y++) {
-    mandelSimdRow(width, height, iterations, zoom, y)
+    mandelSimdRow(y, width, height, centerX, centerY, rectX, rectY, iterations)
   }
 }

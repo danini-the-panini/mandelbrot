@@ -1,14 +1,14 @@
+import { Point } from "../brots/Mandelbrot"
+
 export default function mandelbrot(
   x:          number,
   y:          number,
-  centerX:    number,
-  centerY:    number,
-  rectX:      number,
-  rectY:      number,
+  center:     Point,
+  rectangle:  Point,
   iterations: number
 ): number {
-  let cX = centerX + x * rectX
-  let cY = centerY + y * rectY
+  let cX = center.x + x * rectangle.x
+  let cY = center.y + y * rectangle.y
   let zx = cX
   let zy = cY
 

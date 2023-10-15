@@ -2,6 +2,7 @@ import BaseWorker from "./BaseWorker"
 
 import assembly from '../wasm/assembly.wasm?init'
 import wasmAbort from "../utils/wasmAbort";
+import { Point } from "../brots/Mandelbrot";
 
 class Wasmelworker extends BaseWorker<WebAssembly.Memory> {
   instance: WebAssembly.Instance;
@@ -18,8 +19,8 @@ class Wasmelworker extends BaseWorker<WebAssembly.Memory> {
     })
   }
 
-  async perform(iterations: number, zoom: number, y: number): Promise<void> {
-    this.runMandelbrotRow(this.width, this.height, iterations, zoom, y)
+  async perform(y: number, center: Point, rectangle: Point, iterations: number): Promise<void> {
+    this.runMandelbrotRow(y, this.width, this.height, center.x, center.y, rectangle.x, rectangle.y, iterations)
   }
 }
 
