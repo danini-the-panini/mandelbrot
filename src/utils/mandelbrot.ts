@@ -1,8 +1,16 @@
-export default function mandelbrot(x: number, y: number, width: number, height: number, iterations: number, zoom: number): number {
-  let zx = 0
-  let zy = 0
-  let cX = (x - width/2) / zoom
-  let cY = (y - height/2) / zoom
+export default function mandelbrot(
+  x:          number,
+  y:          number,
+  centerX:    number,
+  centerY:    number,
+  width:      number,
+  height:     number,
+  iterations: number
+): number {
+  let cX = centerX + x * width
+  let cY = centerY + y * height
+  let zx = cX
+  let zy = cY
 
   let iter = iterations
 

@@ -1,7 +1,6 @@
-import { ZOOM } from "../utils/constants";
 import mandelbrot from "../utils/mandelbrot";
 import setRGB from "../utils/setrgb";
-import Mandelbrot from "./Mandelbrot";
+import Mandelbrot, { Point } from "./Mandelbrot";
 
 export default class Vanillalbrot extends Mandelbrot {
   context: CanvasRenderingContext2D
@@ -19,10 +18,13 @@ export default class Vanillalbrot extends Mandelbrot {
     this.image = this.context.createImageData(this.width, this.height)!
   }
 
-  async perform(iterations: number): Promise<void> {
+  async perform(iterations: number, center: Point, rectangle: Point): Promise<void> {
     for (let y = 0; y < this.height; y++) {
       for (let x = 0; x < this.width; x++) {
-        let iter = mandelbrot(x, y, this.width, this.height, iterations, ZOOM)
+        let fX = (x / this.width) * 2 - 1
+        let fY = (y / this.height) * 2 - 1
+
+        let iter = mandelbrot(fX, fY, center.x, center.y, rectangle.x, rectangle.y, iterations)
         setRGB(this.image, x, y, iter)
       }
     }
