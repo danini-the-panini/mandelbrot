@@ -59,6 +59,10 @@ export default class MandelbrotController extends Controller {
     return Math.round(Math.pow(2, n / 10))
   }
 
+  set iterations(value: number) {
+    this.iterationsTarget.value = Math.round(Math.log2(value) * 10).toString()
+  }
+
   get implClass() : MandelbrotConstructor {
     return BROTS[this.implTarget.value]
   }
@@ -85,21 +89,32 @@ export default class MandelbrotController extends Controller {
     return { x: scale * aspect, y: scale }
   }
 
+  get params() {
+    return new URLSearchParams(location.search)
+  }
+
   initialize() {
     this.debounceRun = debounce(this.run, 300)
   }
 
   connect() {
-    this.layoutBackground()
-    this.updateIterations()
+    if (this.params.has('x')) this.center.x = parseFloat(this.params.get('x'))
+    if (this.params.has('y')) this.center.y = parseFloat(this.params.get('y'))
+    if (this.params.has('zoomLevel')) this.zoomLevel = parseInt(this.params.get('zoomLevel'), 10)
+    if (this.params.has('iterations')) this.iterations = parseInt(this.params.get('iterations'), 10)
 
     Object.keys(BROTS).forEach((name, index) => {
       const option = document.createElement('option')
       option.value = name
       option.textContent = name
-      if (index === 0) option.selected = true
+      if (this.params.has('impl') ? this.params.get('impl') === name : index === 0) {
+        option.selected = true
+      }
       this.implTarget.append(option)
     })
+
+    this.layoutBackground()
+    this.updateIterations()
 
     this.switchImpl()
     this.layoutBackground()
@@ -109,6 +124,8 @@ export default class MandelbrotController extends Controller {
 
   async switchImpl() {
     this.beforeLoad()
+
+    this.updateUrl()
 
     if (this.impl) {
       await this.impl.destroy()
@@ -164,6 +181,7 @@ export default class MandelbrotController extends Controller {
 
   updateIterations() {
     this.iterationsDisplayTarget.textContent = this.iterations.toString()
+    this.updateUrl()
     this.impl?.clearCanvas()
   }
 
@@ -190,6 +208,7 @@ export default class MandelbrotController extends Controller {
     this.center.x = pointX - (pointX - this.center.x) / zoomDelta;
     this.center.y = pointY - (pointY - this.center.y) / zoomDelta;
 
+    this.updateUrl()
     this.impl?.clearCanvas()
     this.layoutBackground()
     if (this.impl.mode === RunMode.autorun) this.debounceRun()
@@ -210,7 +229,10 @@ export default class MandelbrotController extends Controller {
   }
 
   stopPanning({ button }) {
-    if (button === 0) this.autorun()
+    if (button !== 0) return
+
+    this.updateUrl()
+    this.autorun()
   }
 
   // methods
@@ -276,5 +298,16 @@ export default class MandelbrotController extends Controller {
 
     this.outputTarget.style.backgroundSize     = `${width}px ${height}px`
     this.outputTarget.style.backgroundPosition = `${x}px ${y}px`
+  }
+
+  updateUrl() {
+    const params = new URLSearchParams()
+    params.append('impl', this.implTarget.value)
+    params.append('x', this.center.x.toString())
+    params.append('y', this.center.y.toString())
+    params.append('zoomLevel', this.zoomLevel.toString())
+    params.append('iterations', this.iterations.toString())
+
+    history.replaceState(null, '', `?${params}`)
   }
 }
