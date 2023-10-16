@@ -31,6 +31,7 @@ export default abstract class Mandelbrot {
     this.canvas.dataset.action = [
       'wheel->mandelbrot#wheelZoom:!passive:prevent',
       'mousemove->mandelbrot#mousePan',
+      'mouseup->mandelbrot#stopPanning',
       // TODO: add touch support
     ].join(' ')
     element.append(this.canvas)
@@ -52,17 +53,17 @@ export default abstract class Mandelbrot {
 
   clearCanvas() {}
 
-  async beforePerform(_iterations: number) : Promise<void> {}
+  async beforePerform(_iterations: number, _center: Point, _rectangle: Point) : Promise<void> {}
   abstract perform(iterations: number, center: Point, rectangle: Point) : Promise<void>
-  async afterPerform(_iterations: number) : Promise<void> {}
+  async afterPerform(_iterations: number, _center: Point, _rectangle: Point) : Promise<void> {}
 
   async run(iterations: number, center: Point, rectangle: Point) {
     this.clearCanvas()
-    await this.beforePerform(iterations)
+    await this.beforePerform(iterations, center, rectangle)
 
     await delay(1)
     const elapsed = await this.withTiming(() => this.perform(iterations, center, rectangle))
-    await this.afterPerform(iterations)
+    await this.afterPerform(iterations, center, rectangle)
 
     return elapsed
   }

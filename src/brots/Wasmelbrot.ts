@@ -31,7 +31,7 @@ export default class Wasmelbrot extends Vanillalbrot {
     })
   }
 
-  async beforePerform(_iterations: number): Promise<void> {
+  async beforePerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     const arraySize = this.imageByteSize
     this.updateMemory(arraySize)
     this.data = new Uint8ClampedArray(this.memory.buffer, 0, arraySize)
@@ -41,7 +41,7 @@ export default class Wasmelbrot extends Vanillalbrot {
     this.runMandelbrot(this.width, this.height, center.x, center.y, rectangle.x, rectangle.y, iterations)
   }
 
-  async afterPerform(_iterations: number): Promise<void> {
+  async afterPerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     this.context.putImageData(new ImageData(this.data.slice(), this.width, this.height), 0, 0)
   }
 

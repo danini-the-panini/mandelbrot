@@ -1,7 +1,6 @@
 struct Uniforms {
-  width: f32,
-  height: f32,
-  zoom: f32,
+  center: vec2<f32>,
+  rectangle: vec2<f32>,
   iterations: u32
 }
 
@@ -9,7 +8,7 @@ struct Uniforms {
 
 struct VSOut {
   @builtin(position) pos: vec4<f32>,
-  @location(0) uv: vec2<f32>
+  @location(0) vpos: vec2<f32>
 }
 
 @vertex
@@ -28,20 +27,19 @@ fn vertex_main(@builtin(vertex_index) idx : u32) -> VSOut {
 
   var out : VSOut;
   out.pos = vec4<f32>(pos, 0.0, 1.0);
-  out.uv.x = (pos.x + 1.0) / 2.0;
-  out.uv.y = (1.0 - pos.y) / 2.0;
+  out.vpos = pos;
 
   return out;
 }
 
 @fragment
-fn fragment_main(@location(0) uv: vec2<f32>) -> @location(0) vec4<f32> {
-  let coord = vec2(uv.x * uniforms.width, uv.y * uniforms.height);
+fn fragment_main(@location(0) vpos: vec2<f32>) -> @location(0) vec4<f32> {
+  let coord = uniforms.center + vpos * uniforms.rectangle;
 
-  var zx = 0.0;
-  var zy = 0.0;
-  let cX = (coord.x - uniforms.width / 2.0) / uniforms.zoom;
-  let cY = (coord.y - uniforms.height / 2.0) / uniforms.zoom;
+  let cX = coord.x;
+  let cY = coord.y;
+  var zx = cX;
+  var zy = cY;
 
   var iter = uniforms.iterations;
 

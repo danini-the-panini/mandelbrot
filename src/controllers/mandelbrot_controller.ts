@@ -86,7 +86,7 @@ export default class MandelbrotController extends Controller {
   }
 
   initialize() {
-    this.debounceRun = debounce(this.run, 1000)
+    this.debounceRun = debounce(this.run, 300)
   }
 
   connect() {
@@ -206,8 +206,11 @@ export default class MandelbrotController extends Controller {
 
     this.impl?.clearCanvas()
     this.layoutBackground()
-    if (this.impl.mode === RunMode.autorun) this.debounceRun()
     if (this.impl.mode === RunMode.render) this.render()
+  }
+
+  stopPanning({ button }) {
+    if (button === 0) this.autorun()
   }
 
   // methods

@@ -1,6 +1,6 @@
 /// <reference types="@webgpu/types" />
 
-import Mandelbrot, { RunMode } from "./Mandelbrot";
+import Mandelbrot, { Point, RunMode } from "./Mandelbrot";
 
 import shaderSource from "../shaders/mandelbrot.wgsl?raw"
 import { ZOOM } from "../utils/constants";
@@ -37,9 +37,8 @@ export default class Webgpulbrot extends Mandelbrot {
     })
 
     this.uniformBufferSize = Math.ceil((
-      + 1 * Float32Array.BYTES_PER_ELEMENT // width: f32
-      + 1 * Float32Array.BYTES_PER_ELEMENT // height: f32
-      + 1 * Float32Array.BYTES_PER_ELEMENT // zoom: f32
+      + 2 * Float32Array.BYTES_PER_ELEMENT // center: vec2<f32>
+      + 2 * Float32Array.BYTES_PER_ELEMENT // rectangle: vec2<f32>
       + 1 * Uint32Array.BYTES_PER_ELEMENT  // iterations: u32
     ) / 8) * 8
     
@@ -79,18 +78,17 @@ export default class Webgpulbrot extends Mandelbrot {
     return 'gpu' in navigator
   }
 
-  async beforePerform(iterations: number): Promise<void> {
+  async beforePerform(iterations: number, center: Point, rectangle: Point): Promise<void> {
     const arrayBuffer = new ArrayBuffer(this.uniformBufferSize);
     new Float32Array(arrayBuffer, 0).set([
-      this.width,
-      this.height,
-      ZOOM
+      center.x, -center.y,
+      rectangle.x, rectangle.y
     ]);
-    new Uint32Array(arrayBuffer, (1 + 1 + 1) * Float32Array.BYTES_PER_ELEMENT).set([iterations]);
+    new Uint32Array(arrayBuffer, (2 + 2) * Float32Array.BYTES_PER_ELEMENT).set([iterations]);
     this.device.queue.writeBuffer(this.uniformBuffer, 0, arrayBuffer);
   }
 
-  async perform(_iterations: number): Promise<void> {
+  async perform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     const commandEncoder = this.device.createCommandEncoder({})
 
     const renderPassDescriptor: GPURenderPassDescriptor = {

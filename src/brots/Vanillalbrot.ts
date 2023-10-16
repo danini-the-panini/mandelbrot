@@ -14,7 +14,7 @@ export default class Vanillalbrot extends Mandelbrot {
     this.context.clearRect(0, 0, this.width, this.height);
   }
 
-  async beforePerform(_iterations: number): Promise<void> {
+  async beforePerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     this.image = this.context.createImageData(this.width, this.height)!
   }
 
@@ -31,7 +31,7 @@ export default class Vanillalbrot extends Mandelbrot {
     }
   }
 
-  async afterPerform(_iterations: number): Promise<void> {
+  async afterPerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     this.context.putImageData(this.image, 0, 0)
   }
 

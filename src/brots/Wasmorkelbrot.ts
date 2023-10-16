@@ -3,6 +3,7 @@ import Workelbrot from "./Workelbrot";
 import Wasmelworker from '../workers/Wasmelworker?worker&inline'
 import wasmSupported from "../utils/wasmSupported";
 import roundUpToPages from "../utils/roundUpToPages";
+import { Point } from "./Mandelbrot";
 
 export default class Wasmorkelbrot extends Workelbrot {
   memory: WebAssembly.Memory;
@@ -11,7 +12,7 @@ export default class Wasmorkelbrot extends Workelbrot {
     return (await super.isSupported()) && wasmSupported()
   }
 
-  async beforePerform(_iterations: number): Promise<void> {
+  async beforePerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     this.memory = new WebAssembly.Memory({
       initial: roundUpToPages(this.imageByteSize),
       maximum: 1024,
@@ -23,7 +24,7 @@ export default class Wasmorkelbrot extends Workelbrot {
     }))
   }
 
-  async afterPerform(_iterations: number): Promise<void> {
+  async afterPerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     await Promise.all(this.workers.map(async w => {
       await w.afterPerform()
     }))
