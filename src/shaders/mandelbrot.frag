@@ -2,21 +2,19 @@
 
 precision highp float;
 
-uniform int width;
-uniform int height;
+in vec2 vPosition;
 
-uniform float zoom;
+uniform vec2 center;
+uniform vec2 rectangle;
 uniform int iterations;
 
 out vec4 color;
 
 void main() {
-  vec2 uv = gl_FragCoord.xy / vec2(width, height);
-
-  float zx = 0.0;
-  float zy = 0.0;
-  float cX = (gl_FragCoord.x - float(width) / 2.0) / zoom;
-  float cY = (gl_FragCoord.y - float(height) / 2.0) / zoom;
+  float cX = center.x + vPosition.x * rectangle.x;
+  float cY = center.y + vPosition.y * rectangle.y;
+  float zx = cX;
+  float zy = cY;
 
   int iter = iterations;
 

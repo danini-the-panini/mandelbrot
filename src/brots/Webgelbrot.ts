@@ -1,5 +1,5 @@
 import delay from "../utils/delay";
-import Mandelbrot, { RunMode } from "./Mandelbrot";
+import Mandelbrot, { Point, RunMode } from "./Mandelbrot";
 
 import vertexShaderSource from "../shaders/basic.vert?raw"
 import fragmentShaderSource from "../shaders/mandelbrot.frag?raw"
@@ -10,9 +10,8 @@ export default class Webgelbrot extends Mandelbrot {
   gl: WebGL2RenderingContext
   program: WebGLProgram
   vao: WebGLVertexArrayObject
-  widthLocation: WebGLUniformLocation
-  heightLocation: WebGLUniformLocation
-  zoomLocation: WebGLUniformLocation
+  centerLocation: WebGLUniformLocation
+  rectangleLocation: WebGLUniformLocation
   iterationsLocation: WebGLUniformLocation
   timerEXT: { TIME_ELAPSED_EXT: number }
 
@@ -29,10 +28,8 @@ export default class Webgelbrot extends Mandelbrot {
     this.program = this.createProgram(vertexShader, fragmentShader)
     let positionAttributeLocation = this.gl.getAttribLocation(this.program, "position")
 
-    this.widthLocation = this.gl.getUniformLocation(this.program, 'width')!
-    this.heightLocation = this.gl.getUniformLocation(this.program, 'height')!
-
-    this.zoomLocation = this.gl.getUniformLocation(this.program, 'zoom')!
+    this.centerLocation = this.gl.getUniformLocation(this.program, 'center')!
+    this.rectangleLocation = this.gl.getUniformLocation(this.program, 'rectangle')!
     this.iterationsLocation = this.gl.getUniformLocation(this.program, 'iterations')!
 
     let positionBuffer = this.gl.createBuffer()
@@ -58,22 +55,20 @@ export default class Webgelbrot extends Mandelbrot {
     this.gl.vertexAttribPointer(positionAttributeLocation, size, type, normalize, stride, offset)
   }
 
-  async beforePerform(iterations: number): Promise<void> {
+  async beforePerform(iterations: number, center: Point, rectangle: Point): Promise<void> {
     this.gl.viewport(0, 0, this.width, this.height)
     await animationFrame()
 
     this.gl.useProgram(this.program)
 
-    this.gl.uniform1i(this.widthLocation, this.width)
-    this.gl.uniform1i(this.heightLocation, this.height)
-
-    this.gl.uniform1f(this.zoomLocation, ZOOM)
+    this.gl.uniform2f(this.centerLocation, center.x, -center.y)
+    this.gl.uniform2f(this.rectangleLocation, rectangle.x, rectangle.y)
     this.gl.uniform1i(this.iterationsLocation, iterations)
 
     this.gl.bindVertexArray(this.vao)
   }
 
-  async perform(_iterations: number): Promise<void> {
+  async perform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     let primitiveType = this.gl.TRIANGLE_STRIP
     let offset = 0
     let count = 4

@@ -27,7 +27,7 @@ export default class Workelbrot extends Vanillalbrot {
     return 'Worker' in window
   }
 
-  async beforePerform(_iterations: number): Promise<void> {
+  async beforePerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     this.buffer = new SharedArrayBuffer(this.imageByteSize)
 
     await Promise.all(this.workers.map(async w => {
@@ -57,7 +57,7 @@ export default class Workelbrot extends Vanillalbrot {
     await deferred.promise
   }
 
-  async afterPerform(_iterations: number): Promise<void> {
+  async afterPerform(_iterations: number, _center: Point, _rectangle: Point): Promise<void> {
     await Promise.all(this.workers.map(async w => {
       await w.afterPerform()
     }))
