@@ -16,6 +16,8 @@ export default abstract class Mandelbrot {
   mode = RunMode.off
   devicePixelRatio: number;
 
+  running = true
+
   get imageByteSize() { return (this.width * this.height * 4)|0 }
 
   get height(): number {
@@ -48,6 +50,7 @@ export default abstract class Mandelbrot {
   async initialize(): Promise<void> {}
 
   async destroy(): Promise<void> {
+    this.running = false
     this.canvas.remove()
   }
 
