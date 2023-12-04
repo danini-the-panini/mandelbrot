@@ -8,6 +8,7 @@ import Workelbrot from "../brots/Workelbrot";
 import Wasmorkelbrot from "../brots/Wasmorkelbrot";
 import Webgelbrot from "../brots/Webgelbrot";
 import Webgpulbrot from "../brots/Webgpulbrot";
+import animationFrame from "../utils/animationFrame";
 
 const BROTS = {
   'Vanilla':      Vanillalbrot,
@@ -52,6 +53,11 @@ export default class MandelbrotController extends Controller {
 
   center: Point = { x: 0, y: 0 };
   zoomLevel = 0;
+
+  elapsedTime = 0
+  frameCount = 0
+  lastTime = 0
+  fps = 0
 
   get iterations(): number {
     const n = parseInt(this.iterationsTarget.value, 10)
@@ -127,9 +133,8 @@ export default class MandelbrotController extends Controller {
 
     this.updateUrl()
 
-    if (this.impl) {
-      await this.impl.destroy()
-    }
+    await this.impl?.destroy()
+    await animationFrame()
 
     try {
       this.impl = new this.implClass(this.outputTarget)
@@ -147,7 +152,10 @@ export default class MandelbrotController extends Controller {
     }
 
     if (this.impl?.mode === RunMode.autorun) this.run()
-    if (this.impl?.mode === RunMode.render) this.render()
+    if (this.impl?.mode === RunMode.render) {
+      this.update()
+      this.startRendering()
+    }
   }
 
   async run() {
@@ -172,11 +180,11 @@ export default class MandelbrotController extends Controller {
     this.run()
   }
 
-  render() {
+  update() {
     if (!this.impl) return
     if (this.impl.mode !== RunMode.render) return
 
-    this.implRun()
+    this.impl.beforePerform(this.iterations, this.center, this.rectangle)
   }
 
   updateIterations() {
@@ -190,7 +198,7 @@ export default class MandelbrotController extends Controller {
     if (!this.impl) return
     this.impl.layout()
     if (this.impl.mode === RunMode.autorun) this.debounceRun()
-    if (this.impl.mode === RunMode.render) this.render()
+    if (this.impl.mode === RunMode.render) this.update()
   }
 
   wheelZoom({ offsetX, offsetY, deltaY }) {
@@ -212,7 +220,7 @@ export default class MandelbrotController extends Controller {
     this.impl?.clearCanvas()
     this.layoutBackground()
     if (this.impl.mode === RunMode.autorun) this.debounceRun()
-    if (this.impl.mode === RunMode.render) this.render()
+    if (this.impl.mode === RunMode.render) this.update()
   }
 
   mousePan({ buttons, movementX, movementY }) {
@@ -225,7 +233,7 @@ export default class MandelbrotController extends Controller {
 
     this.impl?.clearCanvas()
     this.layoutBackground()
-    if (this.impl.mode === RunMode.render) this.render()
+    if (this.impl.mode === RunMode.render) this.update()
   }
 
   stopPanning({ button }) {
@@ -309,5 +317,37 @@ export default class MandelbrotController extends Controller {
     params.append('iterations', this.iterations.toString())
 
     history.replaceState(null, '', `?${params}`)
+  }
+
+  startRendering() {
+    if (!this.impl) return
+    if (this.impl.mode !== RunMode.render) return
+
+    requestAnimationFrame(() => this.render(this.impl))
+  }
+
+  render(impl: Mandelbrot) {
+    if (!impl) return
+    if (impl.mode !== RunMode.render) return
+    if (!impl.running) return
+    
+    impl.perform(this.iterations, this.center, this.rectangle)
+
+    let now = performance.now()
+
+    this.frameCount++
+    this.elapsedTime += (now - this.lastTime)
+
+    this.lastTime = now
+
+    if (this.elapsedTime >= 1000) {
+      this.fps = this.frameCount
+      this.frameCount = 0
+      this.elapsedTime = 0
+    }
+
+    this.message = `${this.fps} fps`
+
+    requestAnimationFrame(() => this.render(impl))
   }
 }

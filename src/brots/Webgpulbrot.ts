@@ -109,16 +109,5 @@ export default class Webgpulbrot extends Mandelbrot {
     renderPass.end()
 
     this.device.queue.submit([commandEncoder.finish()])
-
-    if (this.canTime) await this.device.queue.onSubmittedWorkDone()
-  }
-
-  async withTiming(fn: () => Promise<void>): Promise<number> {
-    if (!this.canTime) {
-      await fn()
-      return null
-    }
-
-    return super.withTiming(fn)
   }
 }
