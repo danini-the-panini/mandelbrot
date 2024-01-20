@@ -22,7 +22,7 @@
     "posthtml-extend": "^0.6.5",
     "posthtml-include": "^1.7.4",
     "typescript": "^5.0.2",
-    "vite": "^4.3.9"
+    "vite": "^4.5.2"
   },
   "dependencies": {
     "@hotwired/stimulus": "^3.2.1",
